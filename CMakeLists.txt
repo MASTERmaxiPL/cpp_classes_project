@@ -13,7 +13,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 set(DOMAIN_SOURCES
-  src/Pitch/PitchManager.cpp
+        src/stadium/StadiumManager.cpp
 )
 
 add_library(domain STATIC ${DOMAIN_SOURCES})
@@ -23,7 +23,7 @@ add_executable(football_management_system src/main.cpp)
 target_link_libraries(football_management_system PRIVATE domain)
 
 enable_testing()
-add_executable(PitchManagerTest test/Pitch/PitchManagerTest.cpp)
-target_link_libraries(PitchManagerTest PRIVATE domain GTest::gtest_main)
+add_executable(StadiumManagerTest test/Stadium/StadiumManagerTest.cpp)
+target_link_libraries(StadiumManagerTest PRIVATE domain GTest::gtest_main)
 include(GoogleTest)
-gtest_discover_tests(PitchManagerTest)
+gtest_discover_tests(StadiumManagerTest)

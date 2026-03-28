@@ -8,7 +8,7 @@
 
 using namespace std;
 
-struct Pitch{
+struct Stadium{
     string name;
     Country country;
     string city;

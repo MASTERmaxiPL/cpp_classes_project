@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../src/Pitch/PitchManager.h"
+#include "../src/stadium/StadiumManager.h"
 
 TEST(HelloTest, BasicAssertions) {
     EXPECT_STRNE("hello", "world");
