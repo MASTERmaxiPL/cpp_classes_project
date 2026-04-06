@@ -17,6 +17,8 @@ set(DOMAIN_SOURCES
         src/stadium/StadiumManager.cpp
         src/match/MatchManager.cpp
         src/club/ClubManager.cpp
+        src/person/PersonManager.cpp
+        src/utils/IdGenerator.cpp
 )
 
 add_library(domain STATIC ${DOMAIN_SOURCES})

@@ -1,0 +1,13 @@
+#ifndef FOOTBALL_MANAGEMENT_SYSTEM_ROLE_H
+#define FOOTBALL_MANAGEMENT_SYSTEM_ROLE_H
+#pragma once
+
+enum Role {
+    TEAM_MANAGER,
+    COACH,
+    PHYSIOTHERAPIST,
+    SCOUT,
+    OTHER
+};
+
+#endif

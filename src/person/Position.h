@@ -1,0 +1,14 @@
+#ifndef FOOTBALL_MANAGEMENT_SYSTEM_POSITION_H
+#define FOOTBALL_MANAGEMENT_SYSTEM_POSITION_H
+
+#pragma once
+
+enum Position
+{
+    GOALKEEPER,
+    DEFENDER,
+    MIDFIELDER,
+    FORWARD
+};
+
+#endif

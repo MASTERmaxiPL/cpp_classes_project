@@ -13,9 +13,7 @@ public:
     StadiumManager();
     ~StadiumManager();
 
-    void stadium(string name, Country country, string city, int numberOfSeats, string owning_club);
     void stadium(string name, Country country, string city, int numberOfSeats);
-    void stadium(string name, Country country, string city, string owning_club);
     void stadium(string name, Country country, string city);
 
     Stadium* findStadiumByName(string name, Stadium* stadiums);

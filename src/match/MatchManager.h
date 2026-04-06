@@ -10,10 +10,10 @@ public:
     MatchManager();
     ~MatchManager();
 
-    void match(tm date, Club* club_1, Club* club_2, int score_club_1, int score_club_2, Stadium stadium);
-    void match(tm date, Club* club_1, Club* club_2, int score_club_1, int score_club_2);
-    void match(tm date, Club* club_1, Club* club_2, Stadium stadium);
-    void match(tm date, Club* club_1, Club* club_2);
+    void match(tm date, Club* home_club, Club* away_club, int score_home_club, int score_away_club, Stadium stadium);
+    void match(tm date, Club* home_club, Club* away_club, int score_home_club, int score_away_club);
+    void match(tm date, Club* home_club, Club* away_club, Stadium stadium);
+    void match(tm date, Club* home_club, Club* away_club);
 
     Match* findMatchesByDate(tm date, int day_range, int month_range, int year_range, Match* matches);
     Match* findMatchesByClub(Club club, Match* matches);

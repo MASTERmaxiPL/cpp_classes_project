@@ -14,7 +14,6 @@ struct StadiumData
     Country country;
     string city;
     int numberOfSeats;
-    string owning_club;
 };
 
 struct Stadium{

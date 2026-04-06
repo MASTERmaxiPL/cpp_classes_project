@@ -7,17 +7,29 @@
 
 using namespace std;
 
+struct MatchSquadEntry {
+    uint32_t player_id;
+    Position player_position;
+    MatchSquadEntry* next{nullptr};
+};
+
+struct MatchSquad {
+    MatchSquadEntry* head{nullptr};
+};
+
 struct MatchData {
     tm date;
-    Club* club_1;
-    Club* club_2;
-    int score_club_1;
-    int score_club_2;
     Stadium* stadium;
+    Club* home_club;
+    Club* away_club;
+    int score_home_club;
+    int score_away_club;
+    MatchSquad* homeSquad;
+    MatchSquad* awaySquad;
 };
 
 struct Match {
-    MatchData data;
+    MatchData data{};
     Match *next{nullptr};
 };
 

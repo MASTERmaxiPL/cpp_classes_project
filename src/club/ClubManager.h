@@ -1,12 +1,13 @@
 #ifndef FOOTBALL_MANAGEMENT_SYSTEM_CLUB_MANAGER_H
 #define FOOTBALL_MANAGEMENT_SYSTEM_CLUB_MANAGER_H
 
+#include <unordered_map>
+
 #import "Club.h"
 
 
 class ClubManager {
     Club* head;
-
 public:
     ClubManager();
     ~ClubManager();
@@ -24,6 +25,9 @@ public:
     void deleteClub(Club* club);
 
     void displayClub(Club* club);
+
+    void addPlayerToClub(Player* player, Club* club);
+    void addStaffToClub(Staff* staff, Club* club);
 };
 
 
