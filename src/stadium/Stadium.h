@@ -8,7 +8,8 @@
 
 using namespace std;
 
-struct Stadium{
+struct StadiumData
+{
     string name;
     Country country;
     string city;
@@ -16,4 +17,9 @@ struct Stadium{
     string owning_club;
 };
 
-#endif //CPP_CLASSES_PROJECT_PITCH_H
+struct Stadium{
+    StadiumData data;
+    Stadium* next{nullptr};
+};
+
+#endif

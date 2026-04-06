@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "../src/stadium/StadiumManager.h"
+#include "../../src/club/ClubManager.h"
 
-TEST(HelloTest, BasicAssertions) {
+TEST(HelloTestClub, BasicAssertions) {
     EXPECT_STRNE("hello", "world");
     EXPECT_EQ(7 * 6, 42);
 }

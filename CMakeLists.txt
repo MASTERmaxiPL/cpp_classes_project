@@ -9,11 +9,14 @@ include(FetchContent)
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/2461743991f9aa53e9a3625eafcbacd81a3c74cd.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(googletest)
 
 set(DOMAIN_SOURCES
         src/stadium/StadiumManager.cpp
+        src/match/MatchManager.cpp
+        src/club/ClubManager.cpp
 )
 
 add_library(domain STATIC ${DOMAIN_SOURCES})
@@ -23,7 +26,12 @@ add_executable(football_management_system src/main.cpp)
 target_link_libraries(football_management_system PRIVATE domain)
 
 enable_testing()
-add_executable(StadiumManagerTest test/Stadium/StadiumManagerTest.cpp)
-target_link_libraries(StadiumManagerTest PRIVATE domain GTest::gtest_main)
 include(GoogleTest)
-gtest_discover_tests(StadiumManagerTest)
+
+file(GLOB_RECURSE ALL_TEST_FILES "${CMAKE_SOURCE_DIR}/test/*/*Test.cpp")
+foreach(test_src IN LISTS ALL_TEST_FILES)
+    get_filename_component(test_name ${test_src} NAME_WE) # np. ClubManagerTest
+    add_executable(${test_name} ${test_src})
+    target_link_libraries(${test_name} PRIVATE domain GTest::gtest_main)
+    gtest_discover_tests(${test_name})
+endforeach()
