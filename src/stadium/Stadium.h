@@ -10,19 +10,19 @@ using namespace std;
 
 struct StadiumData
 {
-    string name;
+    char* name;
     Country country;
-    string city;
+    char* city;
     int numberOfSeats;
 };
 
 struct Stadium{
-    StadiumData data;
+    StadiumData data{};
     Stadium* next{nullptr};
 };
 
 struct StadiumListNode {
-    Stadium* stadium{};
+    Stadium* stadium;
     StadiumListNode* next{nullptr};
 };
 

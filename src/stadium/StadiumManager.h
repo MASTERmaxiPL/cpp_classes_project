@@ -8,22 +8,25 @@
 class StadiumManager
 {
     Stadium* head;
+    void clearStadiumMemory(Stadium* stadium);
 public:
     StadiumManager();
     ~StadiumManager();
 
-    void stadium(string name, Country country, string city, int numberOfSeats);
-    void stadium(string name, Country country, string city);
+    void stadium(char* name, Country country, char* city, int numberOfSeats);
+    void stadium(char* name, Country country, char* city);
 
-    Stadium* findStadiumByName(string name, Stadium* stadiums);
-    StadiumListNode* findStadiumsByCountry(Country country, Stadium* stadiums);
-    StadiumListNode* findStadiumsByCity(string city, Stadium* stadiums);
-    StadiumListNode* findStadiumsByMinSeats(int minSeats, Stadium* stadiums);
-    StadiumListNode* findStadiumsByMaxSeats(int maxSeats, Stadium* stadiums);
+    Stadium* findStadiumByName(char* name, Stadium* head);
+    StadiumListNode* findStadiumsByCountry(Country country, Stadium* head);
+    StadiumListNode* findStadiumsByCity(char* city, Stadium* head);
+    StadiumListNode* findStadiumsByMinSeats(int minSeats, Stadium* head);
+    StadiumListNode* findStadiumsByMaxSeats(int maxSeats, Stadium* head);
 
     bool deleteStadium(Stadium* stadium);
+    void deleteAllStadiums(Stadium* head);
+    static void deleteAllWrapperList(StadiumListNode*& head);
 
-    void displayStadium(Stadium* stadium);
+    void displayStadium(Stadium* head) const;
 };
 
 #endif
