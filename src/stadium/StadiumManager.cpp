@@ -14,7 +14,7 @@ StadiumManager::~StadiumManager()
 }
 
 // --- CREATION ---
-void StadiumManager::stadium(char* name, Country country, char* city, int numberOfSeats)
+void StadiumManager::stadium(const char* name, const Country country, const char* city, const int numberOfSeats)
 {
     auto* newStadium = new Stadium;
 
@@ -33,15 +33,37 @@ void StadiumManager::stadium(char* name, Country country, char* city, int number
     head->next = curr;
 }
 
-void StadiumManager::stadium(char* name, Country country, char* city)
+void StadiumManager::stadium(const char* name, const Country country, const char* city)
 {
     stadium(name, country, city, 0);
 }
 
-// --- FILTERS ---
 
-Stadium* StadiumManager::findStadiumByName(char* name, Stadium* head)
+// --- WRAPPING ---
+StadiumListNode* StadiumManager::wrap(Stadium* head) {
+    StadiumListNode* result = nullptr;
+
+    while (head) {
+        result = new StadiumListNode{head, result};
+        head = head->next;
+    }
+
+    return result;
+}
+
+// --- GETTERS ---
+Stadium* StadiumManager::getAllStadiums() const
 {
+    return head;
+}
+
+StadiumListNode* StadiumManager::getAllStadiumsWrapped() const
+{
+    return wrap(head);
+}
+
+// --- FILTERS ---
+Stadium* StadiumManager::findStadiumByName(const char* name, Stadium* head) const {
     if (!head)
         head = this->head;
 
@@ -55,76 +77,89 @@ Stadium* StadiumManager::findStadiumByName(char* name, Stadium* head)
     return nullptr;
 }
 
-StadiumListNode* StadiumManager::findStadiumsByCountry(Country country, Stadium* head)
+Stadium* StadiumManager::findStadiumByNameInWrapper(const char* name, StadiumListNode* head) {
+    if (!head)
+        return nullptr;
+
+    StadiumListNode* curr = head;
+    while (curr)
+    {
+        if (strcmp(curr->stadium->data.name, name) == 0)
+            return curr->stadium;
+        curr = curr->next;
+    }
+    return nullptr;
+}
+
+StadiumListNode* StadiumManager::findStadiumsByCountry(const Country country, StadiumListNode* head)
 {
     if (!head)
-        head = this->head;
+        return nullptr;
 
     StadiumListNode* resultHead = nullptr;
-    Stadium* curr = head;
+    StadiumListNode* curr = head;
 
     while (curr)
     {
-        if (country == curr->data.country)
+        if (country == curr->stadium->data.country)
         {
-            resultHead = new StadiumListNode{curr, resultHead};
+            resultHead = new StadiumListNode{curr->stadium, resultHead};
         }
         curr = curr->next;
     }
     return resultHead;
 }
 
-StadiumListNode* StadiumManager::findStadiumsByCity(char* city, Stadium* head)
+StadiumListNode* StadiumManager::findStadiumsByCity(const char* city, StadiumListNode* head)
 {
     if (!head)
-        head = this->head;
+        return nullptr;
 
     StadiumListNode* resultHead = nullptr;
-    Stadium* curr = head;
+    StadiumListNode* curr = head;
 
     while (curr)
     {
-        if (strcmp(curr->data.city, city) == 0)
+        if (strcmp(curr->stadium->data.city, city) == 0)
         {
-            resultHead = new StadiumListNode{curr, resultHead};
+            resultHead = new StadiumListNode{curr->stadium, resultHead};
         }
         curr = curr->next;
     }
     return resultHead;
 }
 
-StadiumListNode* StadiumManager::findStadiumsByMinSeats(int minSeats, Stadium* head)
+StadiumListNode* StadiumManager::findStadiumsByMinSeats(const int minSeats, StadiumListNode* head)
 {
     if (!head)
-        head = this->head;
+        return nullptr;
 
     StadiumListNode* resultHead = nullptr;
-    Stadium* curr = head;
+    StadiumListNode* curr = head;
 
     while (curr)
     {
-        if (curr->data.numberOfSeats >= minSeats)
+        if (curr->stadium->data.numberOfSeats >= minSeats)
         {
-            resultHead = new StadiumListNode{curr, resultHead};
+            resultHead = new StadiumListNode{curr->stadium, resultHead};
         }
         curr = curr->next;
     }
     return resultHead;
 }
 
-StadiumListNode* StadiumManager::findStadiumsByMaxSeats(int maxSeats, Stadium* head)
-{
+StadiumListNode* StadiumManager::findStadiumsByMaxSeats(const int maxSeats, StadiumListNode* head) {
     if (!head)
-        head = this->head;
+        return nullptr;
 
     StadiumListNode* resultHead = nullptr;
-    Stadium* curr = head;
+    StadiumListNode* curr = head;
 
     while (curr)
     {
-        if (curr->data.numberOfSeats <= maxSeats)
+        if (curr->stadium->data.numberOfSeats <= maxSeats)
         {
-            resultHead = new StadiumListNode{curr, resultHead};
+            resultHead = new StadiumListNode{curr->stadium, resultHead};
         }
         curr = curr->next;
     }
@@ -167,6 +202,34 @@ bool StadiumManager::deleteStadium(Stadium* stadium)
     return false;
 }
 
+bool StadiumManager::deleteWrappedStadium(StadiumListNode*& head, Stadium* target)
+{
+    if (!head || !target)
+        return false;
+
+    if (head->stadium == target)
+    {
+        StadiumListNode* temp = head;
+        head = head->next;
+        delete temp;
+        return true;
+    }
+
+    StadiumListNode* prev = head;
+    while (prev->next && prev->next->stadium != target)
+    {
+        prev = prev->next;
+    }
+
+    if (!prev->next)
+        return false;
+
+    StadiumListNode* temp = prev->next;
+    prev->next = temp->next;
+    delete temp;
+
+    return true;
+}
 
 void StadiumManager::deleteAllStadiums(Stadium* head = nullptr)
 {
@@ -181,7 +244,7 @@ void StadiumManager::deleteAllStadiums(Stadium* head = nullptr)
     this->head = nullptr;
 }
 
-void StadiumManager::deleteAllWrapperList(StadiumListNode*& head)
+void StadiumManager::deleteAllWrappedList(StadiumListNode*& head)
 {
     while (head)
     {
@@ -192,17 +255,50 @@ void StadiumManager::deleteAllWrapperList(StadiumListNode*& head)
 }
 
 // --- DISPLAY ---
-void StadiumManager::displayStadium(Stadium* head) const
+void StadiumManager::displayStadium(const Stadium* stadium)
+{
+    if (!stadium)
+        return;
+
+    cout << stadium->data.name << ": " << stadium->data.country << ", " << stadium->data.city <<
+        "; number of seats" << stadium->data.numberOfSeats << endl;
+}
+
+void StadiumManager::displayStadiumList(Stadium* head)
 {
     if (!head)
-        head = this->head;
+        return;
 
     Stadium* curr = head;
 
     cout << "Stadiums List" << endl;
     while (curr)
     {
-        cout << curr->data.name << ": " << curr->data.country << ", " << curr->data.city << "; number of seats" << curr->data.numberOfSeats << endl;
+        displayStadium(curr);
+        curr = curr->next;
+    }
+    cout << "===============" << endl;
+}
+
+void StadiumManager::displayWrappedStadium(const StadiumListNode* wrapped_stadium)
+{
+    if (!wrapped_stadium)
+        return;
+
+    displayStadium(wrapped_stadium->stadium);
+}
+
+void StadiumManager::displayWrappedStadiumList(StadiumListNode* wrapped_stadium)
+{
+    if (!wrapped_stadium)
+        return;
+
+    StadiumListNode* curr = wrapped_stadium;
+
+    cout << "Stadiums List" << endl;
+    while (curr)
+    {
+        displayWrappedStadium(curr);
         curr = curr->next;
     }
     cout << "===============" << endl;

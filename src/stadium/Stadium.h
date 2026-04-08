@@ -22,7 +22,7 @@ struct Stadium{
 };
 
 struct StadiumListNode {
-    Stadium* stadium;
+    Stadium* stadium{};
     StadiumListNode* next{nullptr};
 };
 

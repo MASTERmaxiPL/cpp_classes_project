@@ -4,7 +4,7 @@
 #include "../../src/stadium/StadiumManager.h"
 #include "../../src/utils/Country.h"
 
-class StadiumManagerTest : public ::testing::Test
+class StadiumManagerTest : public testing::Test
 {
     protected:
     void SetUp() override
@@ -21,7 +21,9 @@ class StadiumManagerTest : public ::testing::Test
 TEST(StadiumManagerAdditionTest, AddStadiumToEmptyList) {
     StadiumManager sm;
     sm.stadium("Stadion Miejski Legii Warszawa", POLAND, "Warsaw", 80000);
-    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Legii Warszawa", nullptr);
+
+    auto list = sm.getAllStadiums();
+    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Legii Warszawa", list);
     EXPECT_NE(s1, nullptr);
 }
 
@@ -30,101 +32,220 @@ TEST(StadiumManagerAdditionTest, AddStadiumToExistingList) {
     sm.stadium("Stadion Miejski Legii Warszawa", POLAND, "Warsaw", 80000);
     sm.stadium("Stadion Miejski Pogoni Szczecin", POLAND, "Szczecin", 40000);
 
-    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Pogoni Szczecin", nullptr);
-    Stadium* s2 = sm.findStadiumByName("Stadion Miejski Legii Warszawa", nullptr);
+    auto list = sm.getAllStadiums();
+
+    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Pogoni Szczecin", list);
+    Stadium* s2 = sm.findStadiumByName("Stadion Miejski Legii Warszawa", list);
 
     EXPECT_NE(s1, nullptr);
     EXPECT_NE(s2, nullptr);
     EXPECT_EQ(s2->next, nullptr);
 }
 
+TEST(StadiumManagerGetters, GetAllStadiumsFromEmptyList) {
+    StadiumManager sm;
+
+    Stadium* list = sm.getAllStadiums();
+    EXPECT_EQ(list, nullptr);
+
+    sm.deleteAllStadiums(list);
+}
+
+TEST(StadiumManagerGetters, GetAllStadiumsFromExistingList) {
+    StadiumManager sm;
+    sm.stadium("Stadion Miejski Legii Warszawa", POLAND, "Warsaw", 80000);
+    sm.stadium("Stadion Miejski Pogoni Szczecin", POLAND, "Szczecin", 40000);
+
+    Stadium* list = sm.getAllStadiums();
+    EXPECT_NE(list, nullptr);
+    EXPECT_NE(list->next, nullptr);
+    EXPECT_EQ(list->next->next, nullptr);
+
+    sm.deleteAllStadiums(list);
+}
+
+TEST(StadiumManagerGetters, GetAllStadiumsWrappedFromEmptyList) {
+    StadiumManager sm;
+
+    StadiumListNode* list = sm.getAllStadiumsWrapped();
+    EXPECT_EQ(list, nullptr);
+
+    sm.deleteAllWrappedList(list);
+}
+
+TEST(StadiumManagerGetters, GetAllStadiumsWrappedFromExistingList) {
+    StadiumManager sm;
+    sm.stadium("Stadion Miejski Legii Warszawa", POLAND, "Warsaw", 80000);
+    sm.stadium("Stadion Miejski Pogoni Szczecin", POLAND, "Szczecin", 40000);
+
+    StadiumListNode* list = sm.getAllStadiumsWrapped();
+    EXPECT_NE(list, nullptr);
+    EXPECT_NE(list->next, nullptr);
+    EXPECT_EQ(list->next->next, nullptr);
+
+    sm.deleteAllWrappedList(list);
+}
+
+TEST_F(StadiumManagerTest, TryToFindNotExistingStadiumByName)
+{
+    auto list = sm.getAllStadiumsWrapped();
+    Stadium* s1 = sm.findStadiumByNameInWrapper("UNKNOWN", list);
+
+    EXPECT_EQ(s1, nullptr);
+
+    sm.deleteAllWrappedList(list);
+}
+
 TEST_F(StadiumManagerTest, FindStadiumByName)
 {
-    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy", nullptr);
+    auto list = sm.getAllStadiums();
+    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy", list);
     EXPECT_NE(s1, nullptr);
+}
+
+TEST_F(StadiumManagerTest, FindWrappedStadiumByName)
+{
+    auto list = sm.getAllStadiumsWrapped();
+    Stadium* s1 = sm.findStadiumByNameInWrapper("Stadion Narodowy", list);
+    EXPECT_NE(s1, nullptr);
+
+    sm.deleteAllWrappedList(list);
 }
 
 TEST_F(StadiumManagerTest, FindStadiumsByCountry)
 {
-    StadiumListNode* s1 = sm.findStadiumsByCountry(POLAND, nullptr);
+    auto list = sm.getAllStadiumsWrapped();
+    StadiumListNode* s1 = sm.findStadiumsByCountry(POLAND, list);
+
     EXPECT_NE(s1, nullptr);
     EXPECT_NE(s1->next, nullptr);
+
+    sm.deleteAllWrappedList(list);
 }
 
 TEST_F(StadiumManagerTest, FindStadiumsByCity)
 {
-    StadiumListNode* s1 = sm.findStadiumsByCity("Warsaw", nullptr);
+    auto list = sm.getAllStadiumsWrapped();
+    StadiumListNode* s1 = sm.findStadiumsByCity("Warsaw", list);
+
     EXPECT_NE(s1, nullptr);
     EXPECT_NE(s1->next, nullptr);
+
+    sm.deleteAllWrappedList(list);
 }
 
 TEST_F(StadiumManagerTest, FindStadiumsByMinSeats)
 {
-    StadiumListNode* s1 = sm.findStadiumsByMinSeats(150000, nullptr);
+    auto list = sm.getAllStadiumsWrapped();
+    StadiumListNode* s1 = sm.findStadiumsByMinSeats(150000, list);
+
     EXPECT_NE(s1, nullptr);
+
     int count = 0;
     for (StadiumListNode* it = s1; it != nullptr; it = it->next)
         count++;
     EXPECT_EQ(count, 1);
 
     EXPECT_EQ(s1->next, nullptr);
+
+    sm.deleteAllWrappedList(list);
 }
 
 TEST_F(StadiumManagerTest, FindStadiumsByMaxSeats)
 {
-    StadiumListNode* s1 = sm.findStadiumsByMaxSeats(80000, nullptr);
+    auto list = sm.getAllStadiumsWrapped();
+    StadiumListNode* s1 = sm.findStadiumsByMaxSeats(80000, list);
+
     EXPECT_NE(s1, nullptr);
     EXPECT_NE(s1->next, nullptr);
+
+    sm.deleteAllWrappedList(list);
+}
+
+TEST_F(StadiumManagerTest, ChainFilters)
+{
+    auto list = sm.getAllStadiumsWrapped();
+
+    auto poland = sm.findStadiumsByCountry(POLAND, list);
+    auto warsaw = sm.findStadiumsByCity("Warsaw", poland);
+
+    int count = 0;
+    for (auto* it = warsaw; it != nullptr; it = it->next)
+        count++;
+
+    EXPECT_EQ(count, 2);
+
+    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedList(poland);
+    sm.deleteAllWrappedList(warsaw);
 }
 
 TEST(StadiumManagerTestEdgeCase, DeleteStadiumFromEmptyList)
 {
     StadiumManager sm;
-    auto* s = new Stadium();
-    const bool success = sm.deleteStadium(s);
+    Stadium s;
+    const bool success = sm.deleteStadium(&s);
     ASSERT_FALSE(success);
 }
 
 TEST_F(StadiumManagerTest, DeleteStadium)
 {
-    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy", nullptr);
+    auto list = sm.getAllStadiums();
+    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy", list);
+
     const bool success = sm.deleteStadium(s1);
     ASSERT_TRUE(success);
-    s1 = sm.findStadiumByName("Stadion Narodowy", nullptr);
+
+    s1 = sm.findStadiumByName("Stadion Narodowy", list);
     EXPECT_EQ(s1, nullptr);
 }
 
 TEST_F(StadiumManagerTest, DeleteAllStadiums)
 {
     sm.deleteAllStadiums(nullptr);
-    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Legii Warszawa", nullptr);
-    Stadium* s2 = sm.findStadiumByName("Allianz Arena", nullptr);
+
+    Stadium* list = sm.getAllStadiums(); // now nullptr
+
+    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Legii Warszawa", list);
+    Stadium* s2 = sm.findStadiumByName("Allianz Arena", list);
+
     EXPECT_EQ(s1, nullptr);
     EXPECT_EQ(s2, nullptr);
 }
 
-TEST(StadiumManagerWrapperTest, DeleteAllWrapperList)
+TEST_F(StadiumManagerTest, DeleteWrapperStadium)
 {
-    StadiumManager sm;
+    auto list = sm.getAllStadiumsWrapped();
 
-    Stadium* s1 = new Stadium();
-    auto* el1 = new StadiumListNode();
-    el1->stadium = s1;
-    el1->stadium->data.name = "TEST_1";
-    Stadium* s2 = new Stadium();
-    auto* el2 = new StadiumListNode();
-    el2->stadium = s2;
-    el2->stadium->data.name = "TEST_2";
-    el2->next = el1;
+    Stadium* s = sm.findStadiumByNameInWrapper("Stadion Narodowy", list);
+    ASSERT_NE(s, nullptr);
 
-    sm.deleteAllWrapperList(el2);
+    bool removed = sm.deleteWrappedStadium(list, s);
+    EXPECT_TRUE(removed);
 
-    EXPECT_EQ(el2, nullptr);
+    Stadium* again = sm.findStadiumByNameInWrapper("Stadion Narodowy", list);
+    EXPECT_EQ(again, nullptr);
+
+    sm.deleteAllWrappedList(list);
+}
+
+TEST_F(StadiumManagerTest, DeleteAllWrapperList)
+{
+    auto list = sm.getAllStadiumsWrapped();
+
+    sm.deleteAllWrappedList(list);
+
+    StadiumListNode* s1 = sm.findStadiumsByCountry(POLAND, list);
+    StadiumListNode* s2 = sm.findStadiumsByCity("Warsaw", list);
+
+    EXPECT_EQ(s1, nullptr);
+    EXPECT_EQ(s2, nullptr);
 }
 
 TEST_F(StadiumManagerTest, DisplayStadium)
 {
-    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy", nullptr);
+    auto list = sm.getAllStadiums();
+    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy", list);
 
     std::stringstream buffer;
     std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
@@ -135,4 +256,59 @@ TEST_F(StadiumManagerTest, DisplayStadium)
     std::string output = buffer.str();
 
     ASSERT_NE(output.find("Stadion Narodowy"), std::string::npos);
+}
+
+TEST_F(StadiumManagerTest, DisplayStadiumList)
+{
+    auto list = sm.getAllStadiums();
+
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    sm.displayStadiumList(list);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    ASSERT_NE(output.find("Stade de l'Independance"), std::string::npos);
+    ASSERT_NE(output.find("Allianz Arena"), std::string::npos);
+    ASSERT_NE(output.find("Stadion Narodowy"), std::string::npos);
+    ASSERT_NE(output.find("Stadion Miejski Legii Warszawa"), std::string::npos);
+}
+
+TEST_F(StadiumManagerTest, DisplayWrappedStadium)
+{
+    auto list = sm.getAllStadiumsWrapped();
+
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    sm.displayWrappedStadium(list);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    ASSERT_NE(output.find(list->stadium->data.name), std::string::npos);
+
+    sm.deleteAllWrappedList(list);
+}
+
+TEST_F(StadiumManagerTest, DisplayWrappedStadiumList)
+{
+    auto list = sm.getAllStadiumsWrapped();
+
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    sm.displayWrappedStadiumList(list);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    ASSERT_NE(output.find("Stade de l'Independance"), std::string::npos);
+    ASSERT_NE(output.find("Allianz Arena"), std::string::npos);
+    ASSERT_NE(output.find("Stadion Narodowy"), std::string::npos);
+    ASSERT_NE(output.find("Stadion Miejski Legii Warszawa"), std::string::npos);
+
+    sm.deleteAllWrappedList(list);
 }
