@@ -1,1 +1,365 @@
 #include "ClubManager.h"
+
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+// --- CONSTRUCTORS & DESTRUCTORS ---
+ClubManager::ClubManager() : head(nullptr) {}
+
+ClubManager::~ClubManager()
+{
+    deleteAllClubs(head);
+}
+
+// --- CREATION ---
+void ClubManager::club(const char* name, const Country country) {
+    auto newClub = new Club;
+
+    newClub->data.name = new char[strlen(name) +1];
+    strcpy(newClub->data.name, name);
+
+    newClub->data.country = country;
+
+    newClub->data.city = nullptr;
+
+    newClub->data.founded_year = 0;
+
+    Club* curr = head;
+    head = newClub;
+    head->next = curr;
+}
+
+void ClubManager::club(const char* name, const Country country, const char* city) {
+    auto newClub = new Club;
+
+    newClub->data.name = new char[strlen(name) +1];
+    strcpy(newClub->data.name, name);
+
+    newClub->data.country = country;
+
+    newClub->data.city = new char[strlen(name) +1];
+    strcpy(newClub->data.city, city);
+
+    newClub->data.founded_year = 0;
+
+    Club* curr = head;
+    head = newClub;
+    head->next = curr;
+}
+
+void ClubManager::club(const char* name, const Country country, const int founded_year) {
+    auto newClub = new Club;
+
+    newClub->data.name = new char[strlen(name) +1];
+    strcpy(newClub->data.name, name);
+
+    newClub->data.country = country;
+
+    newClub->data.city = nullptr;
+
+    newClub->data.founded_year = founded_year;
+
+    Club* curr = head;
+    head = newClub;
+    head->next = curr;
+}
+
+void ClubManager::club(const char* name, const Country country, const char* city, const int founded_year) {
+    auto newClub = new Club;
+
+    newClub->data.name = new char[strlen(name) +1];
+    strcpy(newClub->data.name, name);
+
+    newClub->data.country = country;
+
+    newClub->data.city = new char[strlen(name) +1];
+    strcpy(newClub->data.city, city);
+
+    newClub->data.founded_year = founded_year;
+
+    Club* curr = head;
+    head = newClub;
+    head->next = curr;
+}
+
+// --- WRAPPING ---
+ClubListNode* ClubManager::wrap(Club* head) {
+    ClubListNode* result = nullptr;
+
+    while (head) {
+        result = new ClubListNode{head, result};
+        head = head->next;
+    }
+
+    return result;
+}
+
+
+// --- GETTERS ---
+Club* ClubManager::getAllClubs() const
+{
+    return head;
+}
+
+ClubListNode* ClubManager::getAllClubsWrapped() const
+{
+    return wrap(head);
+}
+
+// --- FILTERS ---
+Club* ClubManager::findClubByName(const char* name, Club* head) {
+    if (!head)
+        head = this->head;
+
+    Club* curr = head;
+    while (curr) {
+        if (!strcmp(curr->data.name, name))
+            return curr;
+        curr = curr->next;
+    }
+    return nullptr;
+}
+
+Club* ClubManager::findClubByNameInWrapper(const char* name, ClubListNode* head) {
+    if (!head)
+        return nullptr;
+
+    ClubListNode* curr = head;
+    while (curr)
+    {
+        if (strcmp(curr->club->data.name, name) == 0)
+            return curr->club;
+        curr = curr->next;
+    }
+    return nullptr;
+}
+
+ClubListNode* ClubManager::findClubsByCountry(const Country country, ClubListNode* head) {
+    if (!head)
+        return nullptr;
+
+    ClubListNode* resultHead = nullptr;
+    ClubListNode* curr = head;
+
+    while (curr)
+    {
+        if (country == curr->club->data.country)
+        {
+            resultHead = new ClubListNode{curr->club, resultHead};
+        }
+        curr = curr->next;
+    }
+    return resultHead;
+}
+
+ClubListNode* ClubManager::findClubsByCity(const char* city, ClubListNode* head) {
+    if (!head)
+        return nullptr;
+
+    ClubListNode* resultHead = nullptr;
+    ClubListNode* curr = head;
+
+    while (curr)
+    {
+        if (strcmp(curr->club->data.city, city) == 0)
+        {
+            resultHead = new ClubListNode{curr->club, resultHead};
+        }
+        curr = curr->next;
+    }
+    return resultHead;
+}
+
+ClubListNode* ClubManager::findClubsByFoundedYear(const int founded_year, ClubListNode* head) {
+    if (!head)
+        return nullptr;
+
+    ClubListNode* resultHead = nullptr;
+    ClubListNode* curr = head;
+
+    while (curr)
+    {
+        if (curr->club->data.founded_year == founded_year)
+        {
+            resultHead = new ClubListNode{curr->club, resultHead};
+        }
+        curr = curr->next;
+    }
+    return resultHead;
+}
+
+ClubListNode* ClubManager::findClubsByNewerFoundedYear(const int founded_year, ClubListNode* head) {
+    if (!head)
+        return nullptr;
+
+    ClubListNode* resultHead = nullptr;
+    ClubListNode* curr = head;
+
+    while (curr)
+    {
+        if (curr->club->data.founded_year > founded_year)
+        {
+            resultHead = new ClubListNode{curr->club, resultHead};
+        }
+        curr = curr->next;
+    }
+    return resultHead;
+}
+
+ClubListNode* ClubManager::findClubsByOlderFoundedYear(const int founded_year, ClubListNode* head) {
+    if (!head)
+        return nullptr;
+
+    ClubListNode* resultHead = nullptr;
+    ClubListNode* curr = head;
+
+    while (curr)
+    {
+        if (curr->club->data.founded_year < founded_year)
+        {
+            resultHead = new ClubListNode{curr->club, resultHead};
+        }
+        curr = curr->next;
+    }
+    return resultHead;
+}
+
+// --- DELETION ---
+void ClubManager::clearClubMemory(Club* club)
+{
+    if (club)
+    {
+        delete[] club->data.name;
+        delete[] club->data.city;
+
+        //delete club stadium, player and staff list
+
+        delete club;
+    }
+}
+
+bool ClubManager::deleteClub(Club* club) {
+    if (!club) return false;
+
+    if (club == head) {
+        Club* temp = head;
+        head = club->next;
+        clearClubMemory(temp);
+        return true;
+    }
+
+    Club* prev = head;
+    while (prev && prev->next != club)
+        prev = prev->next;
+    if (prev) {
+        prev->next = club->next;
+        clearClubMemory(club);
+        return true;
+    }
+    return false;
+}
+
+bool ClubManager::deleteWrappedClub(ClubListNode*& head, Club* target)
+{
+    if (!head || !target)
+        return false;
+
+    if (head->club == target)
+    {
+        ClubListNode* temp = head;
+        head = head->next;
+        delete temp;
+        return true;
+    }
+
+    ClubListNode* prev = head;
+    while (prev->next && prev->next->club != target)
+    {
+        prev = prev->next;
+    }
+
+    if (!prev->next)
+        return false;
+
+    ClubListNode* temp = prev->next;
+    prev->next = temp->next;
+    delete temp;
+
+    return true;
+}
+
+void ClubManager::deleteAllClubs(Club* head) {
+    if(!head) {
+        head = this->head;
+    }
+    while(head) {
+        Club* next = head->next;
+        clearClubMemory(head);
+        head = next;
+    }
+    this->head = nullptr;
+}
+
+void ClubManager::deleteAllWrappedList(ClubListNode*& head)
+{
+    while (head)
+    {
+        ClubListNode* next = head->next;
+        delete head;
+        head = next;
+    }
+}
+
+void ClubManager::displayClub(const Club *club) {
+    if (!club)
+        return;
+
+    cout << club->data.name << ": " << club->data.country << ", " << club->data.city <<
+        ", founded in" << club->data.founded_year << endl;
+    cout << "List of current stadiums:" << endl;
+    cout << "List of current players:" << endl;
+    cout << "List of current staff:" << endl;
+    // TO COMPLETE
+}
+
+void ClubManager::displayClubList(Club* head)
+{
+    if (!head)
+        return;
+
+    Club* curr = head;
+
+    cout << "Stadiums List" << endl;
+    while (curr)
+    {
+        displayClub(curr);
+        curr = curr->next;
+    }
+    cout << "===============" << endl;
+}
+
+void ClubManager::displayWrappedClub(const ClubListNode* wrapped_club)
+{
+    if (!wrapped_club)
+        return;
+
+    displayClub(wrapped_club->club);
+}
+
+void ClubManager::displayWrappedClubList(ClubListNode* wrapped_club)
+{
+    if (!wrapped_club)
+        return;
+
+    ClubListNode* curr = wrapped_club;
+
+    cout << "Stadiums List" << endl;
+    while (curr)
+    {
+        displayWrappedClub(curr);
+        curr = curr->next;
+    }
+    cout << "===============" << endl;
+}

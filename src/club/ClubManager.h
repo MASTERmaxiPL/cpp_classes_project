@@ -6,23 +6,43 @@
 
 class ClubManager {
     Club* head;
+
+    static void clearClubMemory(Club* club);
+
+    static ClubListNode* wrap(Club* head);
 public:
     ClubManager();
     ~ClubManager();
 
-    void club(string name, Country country, string city, int founded_year);
-    void club(string name, Country country, string city);
-    void club(string name, Country country, int founded_year);
-    void club(string name, Country country);
+    void club(const char* name, Country country, const char* city, int founded_year);
+    void club(const char* name, Country country, const char* city);
+    void club(const char* name, Country country, int founded_year);
+    void club(const char* name, Country country);
 
-    Club* findClubByName(string name, Club* clubs);
-    Club* findClubsByCountry(Country country, Club* clubs);
-    Club* findClubsByCity(string city, Club* clubs);
-    Club* findClubsByFoundedYear(int founded_year, Club* clubs);
 
-    void deleteClub(Club* club);
+    Club* getAllClubs() const;
+    ClubListNode* getAllClubsWrapped() const;
 
-    void displayClub(Club* club);
+    Club* findClubByName(const char* name, Club* clubs);
+    static Club* findClubByNameInWrapper(const char* name, ClubListNode* head) ;
+
+    static ClubListNode* findClubsByCountry(Country country, ClubListNode* head);
+    static ClubListNode* findClubsByCity(const char* city, ClubListNode* head);
+    static ClubListNode* findClubsByFoundedYear(int founded_year, ClubListNode* head);
+    static ClubListNode* findClubsByNewerFoundedYear(int founded_year, ClubListNode* head);
+    static ClubListNode* findClubsByOlderFoundedYear(int founded_year, ClubListNode* head);
+
+    bool deleteClub(Club* club);
+    static bool deleteWrappedClub(ClubListNode*& head, Club* club);
+
+    void deleteAllClubs(Club* head);
+    static void deleteAllWrappedList(ClubListNode*& head);
+
+    static void displayClub(const Club* club);
+    static void displayClubList(Club* head);
+
+    static void displayWrappedClub(const ClubListNode* wrapped_club);
+    static void displayWrappedClubList(ClubListNode* wrapped_club);
 
     void addPlayerToClub(Player* player, Club* club);
     void addStaffToClub(Staff* staff, Club* club);
