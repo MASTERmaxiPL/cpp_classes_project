@@ -2,8 +2,6 @@
 #define FOOTBALL_MANAGEMENT_SYSTEM_CLUB_H
 # pragma once
 
-#include <char*>
-
 #include "../utils/Country.h"
 #include "../person/Player.h"
 #include "../person/Staff.h"
@@ -27,10 +25,10 @@ struct ClubStaff {
 };
 
 struct ClubData {
-    char* name;
+    char* name{};
     Country country;
-    char* city;
-    int founded_year;
+    char* city{};
+    int founded_year{};
 
     ClubStadium* stadium{nullptr};
     ClubPlayer* playersHead{nullptr};

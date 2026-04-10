@@ -10,7 +10,7 @@ ClubManager::ClubManager() : head(nullptr) {}
 
 ClubManager::~ClubManager()
 {
-    deleteAllClubs(head);
+    deleteAllClubs();
 }
 
 // --- CREATION ---
@@ -84,35 +84,23 @@ void ClubManager::club(const char* name, const Country country, const char* city
     head->next = curr;
 }
 
-// --- WRAPPING ---
-ClubListNode* ClubManager::wrap(Club* head) {
+// --- GETTERS ---
+ClubListNode* ClubManager::getAllClubsWrapped() const
+{
     ClubListNode* result = nullptr;
 
-    while (head) {
-        result = new ClubListNode{head, result};
-        head = head->next;
+    Club* curr = head;
+
+    while (curr) {
+        result = new ClubListNode{curr, result};
+        curr = curr->next;
     }
 
     return result;
 }
 
-
-// --- GETTERS ---
-Club* ClubManager::getAllClubs() const
-{
-    return head;
-}
-
-ClubListNode* ClubManager::getAllClubsWrapped() const
-{
-    return wrap(head);
-}
-
 // --- FILTERS ---
-Club* ClubManager::findClubByName(const char* name, Club* head) {
-    if (!head)
-        head = this->head;
-
+Club* ClubManager::findClubByName(const char* name) {
     Club* curr = head;
     while (curr) {
         if (!strcmp(curr->data.name, name))
@@ -290,10 +278,7 @@ bool ClubManager::deleteWrappedClub(ClubListNode*& head, Club* target)
     return true;
 }
 
-void ClubManager::deleteAllClubs(Club* head) {
-    if(!head) {
-        head = this->head;
-    }
+void ClubManager::deleteAllClubs() {
     while(head) {
         Club* next = head->next;
         clearClubMemory(head);
@@ -324,11 +309,8 @@ void ClubManager::displayClub(const Club *club) {
     // TO COMPLETE
 }
 
-void ClubManager::displayClubList(Club* head)
+void ClubManager::displayClubList()
 {
-    if (!head)
-        return;
-
     Club* curr = head;
 
     cout << "Stadiums List" << endl;

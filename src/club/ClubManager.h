@@ -8,8 +8,6 @@ class ClubManager {
     Club* head;
 
     static void clearClubMemory(Club* club);
-
-    static ClubListNode* wrap(Club* head);
 public:
     ClubManager();
     ~ClubManager();
@@ -19,11 +17,9 @@ public:
     void club(const char* name, Country country, int founded_year);
     void club(const char* name, Country country);
 
-
-    Club* getAllClubs() const;
     ClubListNode* getAllClubsWrapped() const;
 
-    Club* findClubByName(const char* name, Club* clubs);
+    Club* findClubByName(const char* name);
     static Club* findClubByNameInWrapper(const char* name, ClubListNode* head) ;
 
     static ClubListNode* findClubsByCountry(Country country, ClubListNode* head);
@@ -35,11 +31,11 @@ public:
     bool deleteClub(Club* club);
     static bool deleteWrappedClub(ClubListNode*& head, Club* club);
 
-    void deleteAllClubs(Club* head);
+    void deleteAllClubs();
     static void deleteAllWrappedList(ClubListNode*& head);
 
     static void displayClub(const Club* club);
-    static void displayClubList(Club* head);
+    void displayClubList();
 
     static void displayWrappedClub(const ClubListNode* wrapped_club);
     static void displayWrappedClubList(ClubListNode* wrapped_club);
