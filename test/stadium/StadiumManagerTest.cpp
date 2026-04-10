@@ -22,8 +22,7 @@ TEST(StadiumManagerAdditionTest, AddStadiumToEmptyList) {
     StadiumManager sm;
     sm.stadium("Stadion Miejski Legii Warszawa", POLAND, "Warsaw", 80000);
 
-    auto list = sm.getAllStadiums();
-    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Legii Warszawa", list);
+    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Legii Warszawa");
     EXPECT_NE(s1, nullptr);
 }
 
@@ -32,36 +31,12 @@ TEST(StadiumManagerAdditionTest, AddStadiumToExistingList) {
     sm.stadium("Stadion Miejski Legii Warszawa", POLAND, "Warsaw", 80000);
     sm.stadium("Stadion Miejski Pogoni Szczecin", POLAND, "Szczecin", 40000);
 
-    auto list = sm.getAllStadiums();
-
-    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Pogoni Szczecin", list);
-    Stadium* s2 = sm.findStadiumByName("Stadion Miejski Legii Warszawa", list);
+    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Pogoni Szczecin");
+    Stadium* s2 = sm.findStadiumByName("Stadion Miejski Legii Warszawa");
 
     EXPECT_NE(s1, nullptr);
     EXPECT_NE(s2, nullptr);
     EXPECT_EQ(s2->next, nullptr);
-}
-
-TEST(StadiumManagerGetters, GetAllStadiumsFromEmptyList) {
-    StadiumManager sm;
-
-    Stadium* list = sm.getAllStadiums();
-    EXPECT_EQ(list, nullptr);
-
-    sm.deleteAllStadiums(list);
-}
-
-TEST(StadiumManagerGetters, GetAllStadiumsFromExistingList) {
-    StadiumManager sm;
-    sm.stadium("Stadion Miejski Legii Warszawa", POLAND, "Warsaw", 80000);
-    sm.stadium("Stadion Miejski Pogoni Szczecin", POLAND, "Szczecin", 40000);
-
-    Stadium* list = sm.getAllStadiums();
-    EXPECT_NE(list, nullptr);
-    EXPECT_NE(list->next, nullptr);
-    EXPECT_EQ(list->next->next, nullptr);
-
-    sm.deleteAllStadiums(list);
 }
 
 TEST(StadiumManagerGetters, GetAllStadiumsWrappedFromEmptyList) {
@@ -98,8 +73,7 @@ TEST_F(StadiumManagerTest, TryToFindNotExistingStadiumByName)
 
 TEST_F(StadiumManagerTest, FindStadiumByName)
 {
-    auto list = sm.getAllStadiums();
-    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy", list);
+    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy");
     EXPECT_NE(s1, nullptr);
 }
 
@@ -190,24 +164,21 @@ TEST(StadiumManagerTestEdgeCase, DeleteStadiumFromEmptyList)
 
 TEST_F(StadiumManagerTest, DeleteStadium)
 {
-    auto list = sm.getAllStadiums();
-    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy", list);
+    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy");
 
     const bool success = sm.deleteStadium(s1);
     ASSERT_TRUE(success);
 
-    s1 = sm.findStadiumByName("Stadion Narodowy", list);
+    s1 = sm.findStadiumByName("Stadion Narodowy");
     EXPECT_EQ(s1, nullptr);
 }
 
 TEST_F(StadiumManagerTest, DeleteAllStadiums)
 {
-    sm.deleteAllStadiums(nullptr);
+    sm.deleteAllStadiums();
 
-    Stadium* list = sm.getAllStadiums(); // now nullptr
-
-    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Legii Warszawa", list);
-    Stadium* s2 = sm.findStadiumByName("Allianz Arena", list);
+    Stadium* s1 = sm.findStadiumByName("Stadion Miejski Legii Warszawa");
+    Stadium* s2 = sm.findStadiumByName("Allianz Arena");
 
     EXPECT_EQ(s1, nullptr);
     EXPECT_EQ(s2, nullptr);
@@ -244,8 +215,7 @@ TEST_F(StadiumManagerTest, DeleteAllWrapperList)
 
 TEST_F(StadiumManagerTest, DisplayStadium)
 {
-    auto list = sm.getAllStadiums();
-    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy", list);
+    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy");
 
     std::stringstream buffer;
     std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
@@ -260,12 +230,10 @@ TEST_F(StadiumManagerTest, DisplayStadium)
 
 TEST_F(StadiumManagerTest, DisplayStadiumList)
 {
-    auto list = sm.getAllStadiums();
-
     std::stringstream buffer;
     std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
 
-    sm.displayStadiumList(list);
+    sm.displayStadiumList();
 
     std::cout.rdbuf(old);
     std::string output = buffer.str();

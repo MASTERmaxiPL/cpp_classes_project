@@ -10,9 +10,6 @@ class StadiumManager
     Stadium* head;
 
     static void clearStadiumMemory(Stadium* stadium);
-
-    static StadiumListNode* wrap(Stadium* head);
-
 public:
     StadiumManager();
     ~StadiumManager();
@@ -20,10 +17,9 @@ public:
     void stadium(const char* name, Country country, const char* city, int numberOfSeats);
     void stadium(const char* name, Country country, const char* city);
 
-    Stadium* getAllStadiums() const;
     StadiumListNode* getAllStadiumsWrapped() const;
 
-    Stadium* findStadiumByName(const char* name, Stadium* head) const;
+    Stadium* findStadiumByName(const char* name) const;
     static Stadium* findStadiumByNameInWrapper(const char* name, StadiumListNode* head) ;
 
     static StadiumListNode* findStadiumsByCountry(Country country, StadiumListNode* head) ;
@@ -34,11 +30,11 @@ public:
     bool deleteStadium(Stadium* stadium);
     static bool deleteWrappedStadium(StadiumListNode*& head, Stadium* target);
 
-    void deleteAllStadiums(Stadium* head);
+    void deleteAllStadiums();
     static void deleteAllWrappedList(StadiumListNode*& head);
 
     static void displayStadium(const Stadium* head);
-    static void displayStadiumList(Stadium* head);
+    void displayStadiumList() const;
 
     static void displayWrappedStadium(const StadiumListNode* wrapped_stadium);
     static void displayWrappedStadiumList(StadiumListNode* wrapped_stadium);

@@ -10,7 +10,7 @@ StadiumManager::StadiumManager() : head(nullptr) {}
 
 StadiumManager::~StadiumManager()
 {
-    deleteAllStadiums(head);
+    deleteAllStadiums();
 }
 
 // --- CREATION ---
@@ -38,35 +38,23 @@ void StadiumManager::stadium(const char* name, const Country country, const char
     stadium(name, country, city, 0);
 }
 
-
-// --- WRAPPING ---
-StadiumListNode* StadiumManager::wrap(Stadium* head) {
+// --- GETTERS ---
+StadiumListNode* StadiumManager::getAllStadiumsWrapped() const
+{
     StadiumListNode* result = nullptr;
 
-    while (head) {
-        result = new StadiumListNode{head, result};
-        head = head->next;
+    Stadium* curr = this->head;
+
+    while (curr) {
+        result = new StadiumListNode{curr, result};
+        curr = curr->next;
     }
 
     return result;
 }
 
-// --- GETTERS ---
-Stadium* StadiumManager::getAllStadiums() const
-{
-    return head;
-}
-
-StadiumListNode* StadiumManager::getAllStadiumsWrapped() const
-{
-    return wrap(head);
-}
-
 // --- FILTERS ---
-Stadium* StadiumManager::findStadiumByName(const char* name, Stadium* head) const {
-    if (!head)
-        head = this->head;
-
+Stadium* StadiumManager::findStadiumByName(const char* name) const {
     Stadium* curr = head;
     while (curr)
     {
@@ -231,10 +219,8 @@ bool StadiumManager::deleteWrappedStadium(StadiumListNode*& head, Stadium* targe
     return true;
 }
 
-void StadiumManager::deleteAllStadiums(Stadium* head = nullptr)
+void StadiumManager::deleteAllStadiums()
 {
-    if (!head)
-        head = this->head;
     while(head)
     {
         Stadium* next = head->next;
@@ -264,11 +250,8 @@ void StadiumManager::displayStadium(const Stadium* stadium)
         "; number of seats" << stadium->data.numberOfSeats << endl;
 }
 
-void StadiumManager::displayStadiumList(Stadium* head)
+void StadiumManager::displayStadiumList() const
 {
-    if (!head)
-        return;
-
     Stadium* curr = head;
 
     cout << "Stadiums List" << endl;
