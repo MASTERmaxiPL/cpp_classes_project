@@ -40,6 +40,7 @@ public:
     static void displayWrappedClub(const ClubListNode* wrapped_club);
     static void displayWrappedClubList(ClubListNode* wrapped_club);
 
+    void addStadiumToClub(Stadium* stadium, Club* club);
     void addPlayerToClub(Player* player, Club* club);
     void addStaffToClub(Staff* staff, Club* club);
 };
