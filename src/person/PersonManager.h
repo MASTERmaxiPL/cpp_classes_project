@@ -13,23 +13,39 @@
 class PersonManager {
     Person* head;
     unordered_map<uint32_t, Person*> peopleById;
+
+    static void clearPersonMemory(Person* person);
 public:
     PersonManager();
     ~PersonManager();
 
-    Player* player(string name, string surname, int age, Country nationality, Position position);
-    Staff* staff(string name, string surname, int age, Country nationality, Role role);
+    static void player(const char* name, const char* surname, int age, Country nationality, Position position);
+    static void staff(const char* name, const char* surname, int age, Country nationality, Role role);
 
-    Person* findPeopleByName(string name, string surname, Person* people);
-    Person* findPeopleByAge(int age, Person* people);
-    Person* findPeopleByNationality(Country nationality, Person* people);
+    PersonListNode* getAllPeopleWrapped() const;
 
-    Person* findPeopleYoungerThan(int age, Person* people);
-    Person* findPeopleOlderThan(int age, Person* people);
+    static Person* findPersonById(uint32_t id, const PersonListNode* head);
 
-    void deletePerson(Person* person);
+    static PersonListNode* findPeopleByName(const char* name,const char* surname, const PersonListNode* head);
+    static PersonListNode* findPeopleByAge(int age, const PersonListNode* head);
+    static PersonListNode* findPeopleYoungerThan(int age, const PersonListNode* head);
+    static PersonListNode* findPeopleOlderThan(int age, const PersonListNode* head);
+    static PersonListNode* findPeopleByNationality(Country nationality, const PersonListNode* head);
 
-    void displayPerson(Person* person);
+    static PersonListNode* findPlayersByPosition(Position position, const PersonListNode* head);
+    static PersonListNode* findStaffByRole(Role role, const PersonListNode* head);
+
+    bool deletePerson(uint32_t personId);
+    static bool deleteWrappedPerson(PersonListNode*& head, uint32_t personId);
+
+    void deleteAllPeople();
+    static void deleteAllWrappedPeople(PersonListNode*& head);
+
+    static void displayPerson(const Person* person);
+    void displayPeopleList() const;
+
+    static void displayWrappedPerson(const PersonListNode* wrapped_person);
+    static void displayWrappedPeopleList(PersonListNode* wrapped_person);
 };
 
 

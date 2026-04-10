@@ -10,18 +10,23 @@
 using namespace std;
 
 struct PersonData {
-    string name;
-    string surname;
+    char* name;
+    char* surname;
     int age;
     Country nationality;
 };
 
 struct Person {
     uint32_t id{};
-    PersonData data;
+    PersonData data{};
     Person* next{nullptr};
 
     virtual ~Person() = default;
+};
+
+struct PersonListNode {
+    Person* person;
+    PersonListNode* next;
 };
 
 #endif

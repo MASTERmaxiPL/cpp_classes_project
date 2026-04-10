@@ -8,7 +8,6 @@
 struct Player : Person
 {
     Position position;
-    int shirt_number;
 };
 
 #endif
