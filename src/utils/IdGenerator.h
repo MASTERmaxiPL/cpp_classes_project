@@ -5,7 +5,7 @@
 
 class IdGenerator {
     uint32_t nextId = 0;
-
+    public:
     uint32_t generateId();
 };
 

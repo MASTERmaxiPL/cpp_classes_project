@@ -9,7 +9,8 @@ enum Country
     GERMANY,
     FRANCE,
     SPAIN,
-    ITALY
+    ITALY,
+    ARGENTINA
 };
 
 #endif //CPP_CLASSES_PROJECT_COUNTRY_H

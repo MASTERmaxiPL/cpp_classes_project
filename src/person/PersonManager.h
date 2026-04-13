@@ -8,19 +8,21 @@
 #include "Player.h"
 #include "Staff.h"
 #include "../utils/Country.h"
+#include "utils/IdGenerator.h"
 
 
 class PersonManager {
     Person* head;
     unordered_map<uint32_t, Person*> peopleById;
+    IdGenerator idGen;
 
     static void clearPersonMemory(Person* person);
 public:
     PersonManager();
     ~PersonManager();
 
-    static void player(const char* name, const char* surname, int age, Country nationality, Position position);
-    static void staff(const char* name, const char* surname, int age, Country nationality, Role role);
+    void player(const char* name, const char* surname, int age, Country nationality, Position position);
+    void staff(const char* name, const char* surname, int age, Country nationality, Role role);
 
     PersonListNode* getAllPeopleWrapped() const;
 

@@ -3,7 +3,7 @@
 #pragma once
 
 enum Role {
-    TEAM_MANAGER,
+    MANAGER,
     COACH,
     PHYSIOTHERAPIST,
     SCOUT,

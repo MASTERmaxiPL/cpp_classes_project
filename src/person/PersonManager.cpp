@@ -5,7 +5,10 @@
 
 using namespace std;
 
-PersonManager::PersonManager() : head(nullptr) {}
+PersonManager::PersonManager() : head(nullptr)
+{
+    idGen = IdGenerator();
+}
 
 PersonManager::~PersonManager()
 {
@@ -16,30 +19,42 @@ void PersonManager::player(const char* name, const char* surname, const int age,
 {
     auto* newPlayer = new Player;
 
+    newPlayer->id = idGen.generateId();
+
     newPlayer->data.name = new char[strlen(name) + 1];
     strcpy(newPlayer->data.name, name);
 
-    newPlayer->data.surname = new char[strlen(name) + 1];
+    newPlayer->data.surname = new char[strlen(surname) + 1];
     strcpy(newPlayer->data.surname, surname);
 
     newPlayer->data.age = age;
     newPlayer->data.nationality = nationality;
     newPlayer->position = position;
+
+    Person* curr = head;
+    head = newPlayer;
+    head->next = curr;
 }
 
 void PersonManager::staff(const char* name, const char* surname, const int age, const Country nationality, const Role role)
 {
     auto* newStaff = new Staff;
 
+    newStaff->id = idGen.generateId();
+
     newStaff->data.name = new char[strlen(name) + 1];
     strcpy(newStaff->data.name, name);
 
-    newStaff->data.surname = new char[strlen(name) + 1];
+    newStaff->data.surname = new char[strlen(surname) + 1];
     strcpy(newStaff->data.surname, surname);
 
     newStaff->data.age = age;
     newStaff->data.nationality = nationality;
     newStaff->role = role;
+
+    Person* curr = head;
+    head = newStaff;
+    head->next = curr;
 }
 
 // --- GETTERS ---
@@ -199,6 +214,9 @@ void PersonManager::clearPersonMemory(Person* person)
 
 bool PersonManager::deletePerson(uint32_t personId)
 {
+    if (!head)
+        return false;
+
     if (head->id == personId)
     {
         Person* temp = head;
@@ -208,9 +226,9 @@ bool PersonManager::deletePerson(uint32_t personId)
     }
 
     Person* prev = head;
-    while (prev && prev->next->id != personId)
+    while (prev->next && prev->next->id != personId)
         prev = prev->next;
-    if (prev)
+    if (prev->next)
     {
         Person* temp = prev->next;
         prev->next = prev->next->next;
@@ -223,11 +241,14 @@ bool PersonManager::deletePerson(uint32_t personId)
 
 bool PersonManager::deleteWrappedPerson(PersonListNode*& head, const uint32_t personId)
 {
+    if (!head)
+        return false;
+
     if (head->person->id == personId)
     {
         PersonListNode* temp = head;
         head = head->next;
-        clearPersonMemory(temp->person);
+        delete temp;
         return true;
     }
 
@@ -275,15 +296,15 @@ void PersonManager::displayPerson(const Person* person)
         return;
 
     cout << person->data.name << " " << person->data.surname << "| " << person->data.age <<
-        "| " << person->data.nationality;
+        "| nationality: " << person->data.nationality;
 
     if (auto* player = dynamic_cast<const Player*>(person))
     {
-        cout << "| " << player->position;
+        cout << "| position: " << player->position;
     }
     else if (auto* staff = dynamic_cast<const Staff*>(person))
     {
-        cout << "| " << staff->role;
+        cout << "| role: " << staff->role;
     }
 }
 
