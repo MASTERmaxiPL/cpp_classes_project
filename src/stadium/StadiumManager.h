@@ -31,7 +31,7 @@ public:
     static bool deleteWrappedStadium(StadiumListNode*& head, Stadium* target);
 
     void deleteAllStadiums();
-    static void deleteAllWrappedList(StadiumListNode*& head);
+    static void deleteAllWrappedStadiums(StadiumListNode*& head);
 
     static void displayStadium(const Stadium* head);
     void displayStadiumList() const;

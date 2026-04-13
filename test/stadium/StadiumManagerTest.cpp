@@ -45,7 +45,7 @@ TEST(StadiumManagerGetters, GetAllStadiumsWrappedFromEmptyList) {
     StadiumListNode* list = sm.getAllStadiumsWrapped();
     EXPECT_EQ(list, nullptr);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }
 
 TEST(StadiumManagerGetters, GetAllStadiumsWrappedFromExistingList) {
@@ -58,7 +58,7 @@ TEST(StadiumManagerGetters, GetAllStadiumsWrappedFromExistingList) {
     EXPECT_NE(list->next, nullptr);
     EXPECT_EQ(list->next->next, nullptr);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }
 
 TEST_F(StadiumManagerTest, TryToFindNotExistingStadiumByName)
@@ -68,7 +68,7 @@ TEST_F(StadiumManagerTest, TryToFindNotExistingStadiumByName)
 
     EXPECT_EQ(s1, nullptr);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }
 
 TEST_F(StadiumManagerTest, FindStadiumByName)
@@ -83,7 +83,7 @@ TEST_F(StadiumManagerTest, FindWrappedStadiumByName)
     Stadium* s1 = sm.findStadiumByNameInWrapper("Stadion Narodowy", list);
     EXPECT_NE(s1, nullptr);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }
 
 TEST_F(StadiumManagerTest, FindStadiumsByCountry)
@@ -94,7 +94,7 @@ TEST_F(StadiumManagerTest, FindStadiumsByCountry)
     EXPECT_NE(s1, nullptr);
     EXPECT_NE(s1->next, nullptr);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }
 
 TEST_F(StadiumManagerTest, FindStadiumsByCity)
@@ -105,7 +105,7 @@ TEST_F(StadiumManagerTest, FindStadiumsByCity)
     EXPECT_NE(s1, nullptr);
     EXPECT_NE(s1->next, nullptr);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }
 
 TEST_F(StadiumManagerTest, FindStadiumsByMinSeats)
@@ -122,7 +122,7 @@ TEST_F(StadiumManagerTest, FindStadiumsByMinSeats)
 
     EXPECT_EQ(s1->next, nullptr);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }
 
 TEST_F(StadiumManagerTest, FindStadiumsByMaxSeats)
@@ -133,7 +133,7 @@ TEST_F(StadiumManagerTest, FindStadiumsByMaxSeats)
     EXPECT_NE(s1, nullptr);
     EXPECT_NE(s1->next, nullptr);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }
 
 TEST_F(StadiumManagerTest, ChainFilters)
@@ -149,9 +149,9 @@ TEST_F(StadiumManagerTest, ChainFilters)
 
     EXPECT_EQ(count, 2);
 
-    sm.deleteAllWrappedList(list);
-    sm.deleteAllWrappedList(poland);
-    sm.deleteAllWrappedList(warsaw);
+    sm.deleteAllWrappedStadiums(list);
+    sm.deleteAllWrappedStadiums(poland);
+    sm.deleteAllWrappedStadiums(warsaw);
 }
 
 TEST(StadiumManagerTestEdgeCase, DeleteStadiumFromEmptyList)
@@ -197,14 +197,14 @@ TEST_F(StadiumManagerTest, DeleteWrapperStadium)
     Stadium* again = sm.findStadiumByNameInWrapper("Stadion Narodowy", list);
     EXPECT_EQ(again, nullptr);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }
 
 TEST_F(StadiumManagerTest, DeleteAllWrapperList)
 {
     auto list = sm.getAllStadiumsWrapped();
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 
     StadiumListNode* s1 = sm.findStadiumsByCountry(POLAND, list);
     StadiumListNode* s2 = sm.findStadiumsByCity("Warsaw", list);
@@ -258,7 +258,7 @@ TEST_F(StadiumManagerTest, DisplayWrappedStadium)
 
     ASSERT_NE(output.find(list->stadium->data.name), std::string::npos);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }
 
 TEST_F(StadiumManagerTest, DisplayWrappedStadiumList)
@@ -278,5 +278,5 @@ TEST_F(StadiumManagerTest, DisplayWrappedStadiumList)
     ASSERT_NE(output.find("Stadion Narodowy"), std::string::npos);
     ASSERT_NE(output.find("Stadion Miejski Legii Warszawa"), std::string::npos);
 
-    sm.deleteAllWrappedList(list);
+    sm.deleteAllWrappedStadiums(list);
 }

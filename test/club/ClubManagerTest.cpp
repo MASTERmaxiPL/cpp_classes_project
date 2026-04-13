@@ -331,3 +331,122 @@ TEST_F(ClubManagerTest, DisplayWrappedClubList)
     sm.deleteAllWrappedList(list);
 }
 
+TEST_F(ClubManagerTest, AddStadiumToClub)
+{
+    Club* club = sm.findClubByName("Legia Warszawa");
+
+    StadiumData data = {"Stadion Wojska Polskiego", POLAND, "Warsaw", 31000};
+    Stadium* stadium = new Stadium{data, nullptr};
+
+    ClubManager::addStadiumToClub(stadium, club);
+
+    int count = ClubManager::getClubStadiumsCount(club);
+    EXPECT_EQ(count, 1);
+
+    delete stadium;
+}
+
+TEST_F(ClubManagerTest, AddPlayerToClub)
+{
+    Club* club = sm.findClubByName("Legia Warszawa");
+
+    Player* player = new Player;
+
+    ClubManager::addPlayerToClub(player, club);
+
+    int count = ClubManager::getClubPlayersCount(club);
+    EXPECT_EQ(count, 1);
+
+    delete player;
+}
+
+TEST_F(ClubManagerTest, AddStaffToClub)
+{
+    Club* club = sm.findClubByName("Legia Warszawa");
+    Staff* staff = new Staff;
+
+    ClubManager::addStaffToClub(staff, club);
+
+    int count = ClubManager::getClubStaffCount(club);
+    EXPECT_EQ(count, 1);
+
+    delete staff;
+}
+
+TEST_F(ClubManagerTest, GetClubStadiumsCountWithEmptyList)
+{
+    Club* club = sm.findClubByName("Legia Warszawa");
+
+    int count = ClubManager::getClubStadiumsCount(club);
+    EXPECT_EQ(count, 0);
+}
+
+TEST_F(ClubManagerTest, GetClubPlayersCountWithEmptyList)
+{
+    Club* club = sm.findClubByName("Legia Warszawa");
+
+    int count = ClubManager::getClubPlayersCount(club);
+    EXPECT_EQ(count, 0);
+}
+
+TEST_F(ClubManagerTest, GetClubStaffCountWithEmptyList)
+{
+    Club* club = sm.findClubByName("Legia Warszawa");
+
+    int count = ClubManager::getClubStaffCount(club);
+    EXPECT_EQ(count, 0);
+}
+
+TEST_F(ClubManagerTest, GetClubStadiumsCountWithExistingList)
+{
+    Club* club = sm.findClubByName("Legia Warszawa");
+
+    StadiumData data1 = {"Stadion Wojska Polskiego", POLAND, "Warsaw", 31000};
+    Stadium* stadium1 = new Stadium{data1, nullptr};
+
+    StadiumData data2 = {"Stadion Legii", POLAND, "Warsaw", 20000};
+    Stadium* stadium2 = new Stadium{data2, nullptr};
+
+    ClubManager::addStadiumToClub(stadium1, club);
+    ClubManager::addStadiumToClub(stadium2, club);
+
+    int count = ClubManager::getClubStadiumsCount(club);
+    EXPECT_EQ(count, 2);
+
+    delete stadium1;
+    delete stadium2;
+}
+
+TEST_F(ClubManagerTest, GetClubPlayersCountWithExistingList)
+{
+    Club* club = sm.findClubByName("Legia Warszawa");
+
+    Player* player1 = new Player;
+    Player* player2 = new Player;
+
+    ClubManager::addPlayerToClub(player1, club);
+    ClubManager::addPlayerToClub(player2, club);
+
+    int count = ClubManager::getClubPlayersCount(club);
+    EXPECT_EQ(count, 2);
+
+    delete player1;
+    delete player2;
+}
+
+TEST_F(ClubManagerTest, GetClubStaffCountWithExistingList)
+{
+    Club* club = sm.findClubByName("Legia Warszawa");
+
+    Staff* staff1 = new Staff;
+    Staff* staff2 = new Staff;
+
+    ClubManager::addStaffToClub(staff1, club);
+    ClubManager::addStaffToClub(staff2, club);
+
+    int count = ClubManager::getClubStaffCount(club);
+    EXPECT_EQ(count, 2);
+
+    delete staff1;
+    delete staff2;
+}

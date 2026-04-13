@@ -215,6 +215,26 @@ ClubListNode* ClubManager::findClubsByOlderFoundedYear(const int founded_year, C
 }
 
 // --- DELETION ---
+void ClubManager::deleteAllWrappedClubStadiums(StadiumListNode*& head)
+{
+    while (head)
+    {
+        StadiumListNode* next = head->next;
+        delete head;
+        head = next;
+    }
+}
+
+void ClubManager::deleteAllWrappedClubPeople(PersonListNode*& head)
+{
+    while (head)
+    {
+        PersonListNode* next = head->next;
+        delete head;
+        head = next;
+    }
+}
+
 void ClubManager::clearClubMemory(Club* club)
 {
     if (club)
@@ -222,7 +242,9 @@ void ClubManager::clearClubMemory(Club* club)
         delete[] club->data.name;
         delete[] club->data.city;
 
-        //delete club stadium, player and staff list
+        deleteAllWrappedClubStadiums(club->data.stadium);
+        deleteAllWrappedClubPeople(club->data.playersHead);
+        deleteAllWrappedClubPeople(club->data.staffHead);
 
         delete club;
     }
@@ -303,13 +325,12 @@ void ClubManager::displayClub(const Club *club) {
 
     cout << club->data.name << ": " << club->data.country << ", " << club->data.city <<
         ", founded in" << club->data.founded_year << endl;
-    cout << "List of current stadiums:" << endl;
-    cout << "List of current players:" << endl;
-    cout << "List of current staff:" << endl;
-    // TO COMPLETE
+    cout << "Number of stadiums:" << getClubPlayersCount(club) <<  endl;
+    cout << "Number of players:" << getClubPlayersCount(club) << endl;
+    cout << "Number of staff:" << getClubStaffCount(club) << endl;
 }
 
-void ClubManager::displayClubList()
+void ClubManager::displayClubList() const
 {
     Club* curr = head;
 
@@ -344,4 +365,76 @@ void ClubManager::displayWrappedClubList(ClubListNode* wrapped_club)
         curr = curr->next;
     }
     cout << "===============" << endl;
+}
+
+void ClubManager::addStadiumToClub(Stadium* stadium, Club* club)
+{
+    if (!stadium || !club)
+        return;
+
+    StadiumListNode* temp = club->data.stadium;
+    club->data.stadium = new StadiumListNode{stadium, temp};
+}
+
+void ClubManager::addPlayerToClub(Player* player, Club* club)
+{
+    if (!player || !club)
+        return;
+
+    PersonListNode* temp = club->data.playersHead;
+    club->data.playersHead = new PersonListNode{player, temp};
+}
+
+void ClubManager::addStaffToClub(Staff* staff, Club* club)
+{
+    if (!staff || !club)
+        return;
+
+    PersonListNode* temp = club->data.staffHead;
+    club->data.staffHead = new PersonListNode{staff, temp};
+}
+
+int ClubManager::getClubStadiumsCount(const Club* club)
+{
+    if (!club)
+        return 0;
+
+    int count = 0;
+    StadiumListNode* curr = club->data.stadium;
+    while (curr)
+    {
+        count++;
+        curr = curr->next;
+    }
+    return count;
+}
+
+int ClubManager::getClubPlayersCount(const Club* club)
+{
+    if (!club)
+        return 0;
+
+    int count = 0;
+    PersonListNode* curr = club->data.playersHead;
+    while (curr)
+    {
+        count++;
+        curr = curr->next;
+    }
+    return count;
+}
+
+int ClubManager::getClubStaffCount(const Club* club)
+{
+    if (!club)
+        return 0;
+
+    int count = 0;
+    PersonListNode* curr = club->data.staffHead;
+    while (curr)
+    {
+        count++;
+        curr = curr->next;
+    }
+    return count;
 }

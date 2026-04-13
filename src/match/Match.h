@@ -3,6 +3,7 @@
 #include <ctime>
 
 #include "club/Club.h"
+#include "person/Position.h"
 #include "stadium/Stadium.h"
 
 using namespace std;

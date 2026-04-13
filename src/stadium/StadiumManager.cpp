@@ -230,7 +230,7 @@ void StadiumManager::deleteAllStadiums()
     this->head = nullptr;
 }
 
-void StadiumManager::deleteAllWrappedList(StadiumListNode*& head)
+void StadiumManager::deleteAllWrappedStadiums(StadiumListNode*& head)
 {
     while (head)
     {
