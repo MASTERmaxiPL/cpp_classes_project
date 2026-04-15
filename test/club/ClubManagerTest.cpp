@@ -251,16 +251,6 @@ TEST_F(ClubManagerTest, DisplayClub)
 
 TEST_F(ClubManagerTest, DisplayClubList)
 {
-    ClubData data1 = {"Test Club", POLAND, "Test City", 2000};
-    Club* club1 = new Club;
-    club1->data = data1;
-
-    ClubData data2 = {"Test Club 2", POLAND, "Test City 2", 2001};
-    Club* club2 = new Club;
-    club2->data = data2;
-
-    club1->next = club2;
-
     std::stringstream buffer;
     std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
 

@@ -2,8 +2,6 @@
 #define FOOTBALL_MANAGEMENT_SYSTEM_PERSON_MANAGER_H
 #pragma once
 
-#include <unordered_map>
-
 #include "Person.h"
 #include "Player.h"
 #include "Staff.h"
@@ -13,7 +11,6 @@
 
 class PersonManager {
     Person* head;
-    unordered_map<uint32_t, Person*> peopleById;
     IdGenerator idGen;
 
     static void clearPersonMemory(Person* person);

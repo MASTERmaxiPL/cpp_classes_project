@@ -1,6 +1,7 @@
 #ifndef FOOTBALL_MANAGEMENT_SYSTEM_MATCH_H
 #define FOOTBALL_MANAGEMENT_SYSTEM_MATCH_H
-#include <ctime>
+#pragma once
+
 
 #include "club/Club.h"
 #include "person/Position.h"
@@ -9,13 +10,9 @@
 using namespace std;
 
 struct MatchSquadEntry {
-    uint32_t player_id;
-    Position player_position;
+    uint32_t player_id{};
+    Position player_position{};
     MatchSquadEntry* next{nullptr};
-};
-
-struct MatchSquad {
-    MatchSquadEntry* head{nullptr};
 };
 
 struct MatchData {
@@ -25,13 +22,19 @@ struct MatchData {
     Club* away_club;
     int score_home_club;
     int score_away_club;
-    MatchSquad* homeSquad;
-    MatchSquad* awaySquad;
+    MatchSquadEntry* homeSquad;
+    MatchSquadEntry* awaySquad;
 };
 
 struct Match {
+    uint32_t id{};
     MatchData data{};
     Match *next{nullptr};
+};
+
+struct MatchListNode {
+    Match* match;
+    MatchListNode* next;
 };
 
 #endif

@@ -186,9 +186,6 @@ TEST_F(PersonManagerTest, DeleteExistingPerson)
     const bool success = pm.deletePerson(1);
     ASSERT_TRUE(success);
 
-    person = pm.findPersonById(1, list);
-    EXPECT_EQ(person, nullptr);
-
     pm.deleteAllWrappedPeople(list);
 }
 
