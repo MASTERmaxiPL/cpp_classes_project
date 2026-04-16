@@ -2,7 +2,7 @@
 #include <cstring>
 
 #include "PersonManager.h"
-#include "club/ClubManager.h"
+#include "../club/ClubManager.h"
 #include "../match/MatchManager.h"
 
 using namespace std;

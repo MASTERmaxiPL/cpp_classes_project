@@ -1,6 +1,8 @@
 #include <iostream>
 #include "MatchManager.h"
 
+#include "../club/Club.h"
+
 
 using namespace std;
 

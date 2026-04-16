@@ -6,8 +6,8 @@
 #include "Player.h"
 #include "Staff.h"
 #include "../utils/Country.h"
-#include "match/MatchManager.h"
-#include "utils/IdGenerator.h"
+#include "../match/MatchManager.h"
+#include "../utils/IdGenerator.h"
 
 class PersonManager {
     Person* head;

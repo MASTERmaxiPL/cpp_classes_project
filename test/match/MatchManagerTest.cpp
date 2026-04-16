@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "../../src/match/MatchManager.h"
+#include "club/Club.h"
 #include "person/Player.h"
 
 class MatchManagerTest : public ::testing::Test

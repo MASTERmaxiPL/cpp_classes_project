@@ -3,9 +3,9 @@
 #pragma once
 
 #include <ctime>
-#include "club/Club.h"
-#include "person/Position.h"
-#include "stadium/Stadium.h"
+#include "../stadium/Stadium.h"
+#include "../person/Person.h"
+#include "../person/Position.h"
 
 using namespace std;
 

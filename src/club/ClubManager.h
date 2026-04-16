@@ -1,9 +1,9 @@
 #ifndef FOOTBALL_MANAGEMENT_SYSTEM_CLUB_MANAGER_H
 #define FOOTBALL_MANAGEMENT_SYSTEM_CLUB_MANAGER_H
 
-#import "Club.h"
-#include "match/MatchManager.h"
-#include "person/Player.h"
+#include "Club.h"
+#include "../match/MatchManager.h"
+#include "../person/Player.h"
 
 
 class ClubManager {

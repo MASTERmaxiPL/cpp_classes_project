@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Stadium.h"
-#include "match/MatchManager.h"
+#include "../match/MatchManager.h"
 
 class StadiumManager
 {
