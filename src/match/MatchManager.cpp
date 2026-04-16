@@ -372,8 +372,6 @@ bool MatchManager::deleteWrappedMatch(MatchListNode*& head, const uint32_t match
 
 void MatchManager::deleteAllMatches()
 {
-    //clearSquadMemory(temp->data.homeSquad);
-    //clearSquadMemory(temp->data.awaySquad);
     while (head)
     {
         Match* next = head->next;
