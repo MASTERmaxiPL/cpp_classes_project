@@ -112,6 +112,27 @@ TEST(MatchManagerAdditionTest, AddMultipleMatches)
     mm.deleteAllWrappedMatches(list);
 }
 
+TEST_F(MatchManagerTest, UpdateMatch)
+{
+    auto* list = mm.getAllMatchesWrapped();
+    auto* match = list->match;
+
+    tm* newDate = mm.createDate(01, 01, 2020);
+    mm.updateMatch(match, *newDate, nullptr, nullptr, nullptr, 3, 2, nullptr, nullptr);
+
+    EXPECT_EQ(match->data.date.tm_mday, 1);
+    EXPECT_EQ(match->data.date.tm_year, 2020-1900);
+
+    EXPECT_NE(match->data.home_club, nullptr);
+
+    EXPECT_EQ(match->data.score_home_club, 3);
+    EXPECT_EQ(match->data.score_away_club, 2);
+
+    EXPECT_NE(match->data.homeSquad, nullptr);
+
+    mm.deleteAllWrappedMatches(list);
+}
+
 TEST(ClubManagerGetters, GetAllMatchesWrappedFromEmptyList) {
     MatchManager mm;
 
@@ -360,21 +381,6 @@ TEST_F(MatchManagerTest, ChainFilters)
     mm.deleteAllWrappedMatches(list);
     mm.deleteAllWrappedMatches(matchesByClub);
     mm.deleteAllWrappedMatches(unplayedMatchesByClub);
-}
-
-TEST_F(MatchManagerTest, UpdateMatchResult)
-{
-    auto* list = mm.getAllMatchesWrapped();
-    auto* match = mm.findMatchById(1, list);
-
-    tm* date = mm.createDate(10, 11, 2015);
-
-    mm.updateMatch(match, *date, 3, 2, nullptr, nullptr);
-
-    EXPECT_EQ(match->data.score_home_club, 3);
-    EXPECT_EQ(match->data.score_away_club, 2);
-
-    mm.deleteAllWrappedMatches(list);
 }
 
 TEST_F(MatchManagerTest, DeleteMatch)

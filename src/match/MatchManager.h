@@ -18,6 +18,8 @@ public:
     void match(const tm& date, Club* home_club, Club* away_club, Stadium* stadium, int score_home_club, int score_away_club);
     void match(const tm& date, Club* home_club, Club* away_club, Stadium* stadium);
 
+    static void updateMatch(Match* match, const tm& date, Club* home_club, Club* away_club, Stadium* stadium, int score_home_club, int score_away_club, MatchSquadEntry* homeSquad, MatchSquadEntry* awaySquad);
+
     static tm* createDate(int day, int month, int year) ;
 
     MatchListNode* getAllMatchesWrapped() const;
@@ -29,8 +31,6 @@ public:
     static MatchListNode* findMatchesByClubs(Club* club1, Club* club2, MatchListNode* head);
     static MatchListNode* findMatchesByStadium(Stadium* stadium, MatchListNode* head);
     static MatchListNode* findUnplayedMatches(MatchListNode* head);
-
-    static void updateMatch(Match* match, const tm& date, int score_home_club, int score_away_club, MatchSquadEntry* homeSquad, MatchSquadEntry* awaySquad);
 
     bool deleteMatch(Match* match);
     static bool deleteWrappedMatch(MatchListNode*& head, uint32_t matchId);

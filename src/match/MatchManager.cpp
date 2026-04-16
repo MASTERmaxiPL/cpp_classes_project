@@ -79,6 +79,28 @@ tm* MatchManager::createDate(const int day, const int month, const int year)
     return new tm(tmp);
 }
 
+void MatchManager::updateMatch(Match* match, const tm& date, Club* home_club, Club* away_club, Stadium* stadium, const int score_home_club, const int score_away_club, MatchSquadEntry* homeSquad, MatchSquadEntry* awaySquad)
+{
+    if (!match)
+        return;
+
+    match->data.date = date;
+    if (home_club)
+        match->data.home_club = home_club;
+    if (away_club)
+        match->data.away_club = away_club;
+    if (stadium)
+        match->data.stadium = stadium;
+    if (score_home_club != -1)
+        match->data.score_home_club = score_home_club;
+    if (score_away_club != -1)
+        match->data.score_away_club = score_away_club;
+    if (homeSquad)
+        match->data.homeSquad = homeSquad;
+    if (awaySquad)
+        match->data.awaySquad = awaySquad;
+}
+
 MatchListNode* MatchManager::getAllMatchesWrapped() const
 {
     MatchListNode* result = nullptr;
@@ -211,20 +233,6 @@ MatchListNode* MatchManager::findUnplayedMatches(MatchListNode* head)
     }
 
     return result;
-}
-
-
-
-void MatchManager::updateMatch(Match* match, const tm& date, const int score_home_club, const int score_away_club, MatchSquadEntry* homeSquad, MatchSquadEntry* awaySquad)
-{
-    if (!match)
-        return;
-
-    match->data.date = date;
-    match->data.score_home_club = score_home_club;
-    match->data.score_away_club = score_away_club;
-    match->data.homeSquad = homeSquad;
-    match->data.awaySquad = awaySquad;
 }
 
 bool MatchManager::deleteMatch(Match* match)
