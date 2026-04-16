@@ -163,7 +163,7 @@ PersonListNode* PersonManager::getAllPeopleWrapped() const
     return result;
 }
 
-// setter/getter dla matchManager
+// -- SETTERS ---
 void PersonManager::setMatchManager(MatchManager* mgr)
 {
     this->matchManager = mgr;

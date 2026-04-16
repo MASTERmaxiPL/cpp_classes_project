@@ -27,7 +27,7 @@ public:
 
     ClubListNode* getAllClubsWrapped() const;
 
-    Club* findClubByName(const char* name);
+    Club* findClubByName(const char* name) const;
     static Club* findClubByNameInWrapper(const char* name, ClubListNode* head) ;
 
     static ClubListNode* findClubsByCountry(Country country, ClubListNode* head);

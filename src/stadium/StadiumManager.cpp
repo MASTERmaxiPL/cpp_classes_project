@@ -103,7 +103,7 @@ StadiumListNode* StadiumManager::getAllStadiumsWrapped() const
     return result;
 }
 
-// setter/getter dla matchManager
+// -- SETTERS ---
 void StadiumManager::setMatchManager(MatchManager* mgr)
 {
     this->matchManager = mgr;

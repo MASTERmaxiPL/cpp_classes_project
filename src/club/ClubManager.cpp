@@ -123,7 +123,8 @@ void ClubManager::setMatchManager(MatchManager* mgr)
 }
 
 // --- FILTERS ---
-Club* ClubManager::findClubByName(const char* name) {
+Club* ClubManager::findClubByName(const char* name) const
+{
     Club* curr = head;
     while (curr) {
         if (!strcmp(curr->data.name, name))
