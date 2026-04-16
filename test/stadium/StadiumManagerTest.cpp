@@ -38,6 +38,14 @@ TEST(StadiumManagerAdditionTest, AddStadiumToExistingList) {
     EXPECT_EQ(s2->next, nullptr);
 }
 
+TEST_F(StadiumManagerTest, EditStadiumData) {
+    sm.stadium("Stadion Narodowy", POLAND, "Warsaw", 150000);
+
+    Stadium* s1 = sm.findStadiumByName("Stadion Narodowy");
+    EXPECT_NE(s1, nullptr);
+    EXPECT_EQ(s1->data.numberOfSeats, 150000);
+}
+
 TEST(StadiumManagerGetters, GetAllStadiumsWrappedFromEmptyList) {
     StadiumManager sm;
 

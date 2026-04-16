@@ -16,6 +16,29 @@ StadiumManager::~StadiumManager()
 // --- CREATION ---
 void StadiumManager::stadium(const char* name, const Country country, const char* city, const int numberOfSeats)
 {
+    if (!name)
+        return;
+
+    Stadium* curr = head;
+    while (curr)
+    {
+        if (strcmp(curr->data.name, name) == 0)
+        {
+            cout << "Stadium with name " << name << " already exists. Stadium data will be edited" << endl;
+            curr->data.country = country;
+            if (numberOfSeats != -1)
+                curr->data.numberOfSeats = numberOfSeats;
+            if (city)
+            {
+                delete [] curr->data.city;
+                curr->data.city = new char[strlen(city) +1];
+                strcpy(curr->data.city, city);
+            }
+            return;
+        }
+        curr = curr->next;
+    }
+
     auto* newStadium = new Stadium;
 
     newStadium->data.name = new char[strlen(name) + 1];
@@ -28,14 +51,14 @@ void StadiumManager::stadium(const char* name, const Country country, const char
 
     newStadium->data.numberOfSeats = numberOfSeats;
 
-    Stadium* curr = head;
+    curr = head;
     head = newStadium;
     head->next = curr;
 }
 
 void StadiumManager::stadium(const char* name, const Country country, const char* city)
 {
-    stadium(name, country, city, 0);
+    stadium(name, country, city, -1);
 }
 
 // --- GETTERS ---
