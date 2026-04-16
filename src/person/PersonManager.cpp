@@ -5,6 +5,7 @@
 
 using namespace std;
 
+// --- CONSTRUCTORS & DESTRUCTORS ---
 PersonManager::PersonManager() : head(nullptr)
 {
     idGen = IdGenerator();
@@ -46,6 +47,7 @@ PersonManager& PersonManager::operator=(const PersonManager& other)
     return *this;
 }
 
+// --- CREATION ---
 void PersonManager::player(const char* name, const char* surname, const int age, const Country nationality, const Position position)
 {
     if (!name || !surname)
@@ -100,6 +102,7 @@ void PersonManager::staff(const char* name, const char* surname, const int age, 
     head->next = curr;
 }
 
+// -- UPDATING ---
 void PersonManager::updatePerson(Person* person, const char* name, const char* surname, const int age, const Country nationality)
 {
     if (!person)

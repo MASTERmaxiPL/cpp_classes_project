@@ -4,6 +4,7 @@
 
 using namespace std;
 
+// -- CONSTRUCTORS & DESTRUCTORS ---
 MatchManager::MatchManager() : head(nullptr)
 {
     idGen = IdGenerator();
@@ -36,6 +37,7 @@ MatchManager& MatchManager::operator=(const MatchManager& other)
     return *this;
 }
 
+// --- CREATION ---
 void MatchManager::match(const tm& date, Club* home_club, Club* away_club, Stadium* stadium, const int score_home_club, const int score_away_club, MatchSquadEntry* homeSquad, MatchSquadEntry* awaySquad)
 {
     auto* newMatch = new Match;
@@ -101,6 +103,7 @@ tm* MatchManager::createDate(const int day, const int month, const int year)
     return new tm(tmp);
 }
 
+// --- UPDATING ---
 void MatchManager::updateMatch(Match* match, const tm& date, Club* home_club, Club* away_club, Stadium* stadium, const int score_home_club, const int score_away_club, MatchSquadEntry* homeSquad, MatchSquadEntry* awaySquad)
 {
     if (!match)
@@ -123,6 +126,7 @@ void MatchManager::updateMatch(Match* match, const tm& date, Club* home_club, Cl
         match->data.awaySquad = awaySquad;
 }
 
+// --- GETTERS ---
 MatchListNode* MatchManager::getAllMatchesWrapped() const
 {
     MatchListNode* result = nullptr;
@@ -137,6 +141,7 @@ MatchListNode* MatchManager::getAllMatchesWrapped() const
     return result;
 }
 
+// --- FILTERS ---
 Match* MatchManager::findMatchById(const uint32_t id, const MatchListNode* head)
 {
     while (head)
@@ -257,6 +262,7 @@ MatchListNode* MatchManager::findUnplayedMatches(MatchListNode* head)
     return result;
 }
 
+// --- DELETION ---
 bool MatchManager::deleteMatch(Match* match)
 {
     if (!head || !match)
@@ -333,6 +339,7 @@ void MatchManager::deleteAllWrappedMatches(MatchListNode*& head)
     }
 }
 
+// --- DISPLAY ---
 void MatchManager::displayMatch(const Match* match)
 {
     if (!match)
