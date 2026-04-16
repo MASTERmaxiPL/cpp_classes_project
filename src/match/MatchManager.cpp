@@ -117,6 +117,25 @@ tm* MatchManager::createDate(const int day, const int month, const int year)
     return new tm(tmp);
 }
 
+void MatchManager::addPlayerToSquad(Match* match, uint32_t playerId, Position pos, bool isHomeSquad)
+{
+    if (!match) return;
+
+    // Create the node completely hidden inside the manager
+    auto* newEntry = new MatchSquadEntry{playerId, pos, nullptr};
+
+    if (isHomeSquad)
+    {
+        newEntry->next = match->data.homeSquad;
+        match->data.homeSquad = newEntry;
+    }
+    else
+    {
+        newEntry->next = match->data.awaySquad;
+        match->data.awaySquad = newEntry;
+    }
+}
+
 // --- UPDATING ---
 void MatchManager::updateMatch(Match* match, const tm& date, Club* home_club, Club* away_club, Stadium* stadium, const int score_home_club, const int score_away_club, MatchSquadEntry* homeSquad, MatchSquadEntry* awaySquad)
 {
@@ -281,6 +300,16 @@ MatchListNode* MatchManager::findUnplayedMatches(MatchListNode* head)
 }
 
 // --- DELETION ---
+void MatchManager::clearSquadMemory(MatchSquadEntry*& squadHead)
+{
+    while (squadHead)
+    {
+        MatchSquadEntry* next = squadHead->next;
+        delete squadHead;
+        squadHead = next;
+    }
+}
+
 bool MatchManager::deleteMatch(Match* match)
 {
     if (!head || !match)
@@ -318,6 +347,8 @@ bool MatchManager::deleteWrappedMatch(MatchListNode*& head, const uint32_t match
     {
         MatchListNode* temp = head;
         head = head->next;
+        clearSquadMemory(temp->match->data.homeSquad);
+        clearSquadMemory(temp->match->data.awaySquad);
         delete temp;
         return true;
     }
@@ -330,6 +361,8 @@ bool MatchManager::deleteWrappedMatch(MatchListNode*& head, const uint32_t match
     {
         MatchListNode* temp = prev->next;
         prev->next = prev->next->next;
+        clearSquadMemory(temp->match->data.homeSquad);
+        clearSquadMemory(temp->match->data.awaySquad);
         delete temp;
         return true;
     }
@@ -339,6 +372,8 @@ bool MatchManager::deleteWrappedMatch(MatchListNode*& head, const uint32_t match
 
 void MatchManager::deleteAllMatches()
 {
+    //clearSquadMemory(temp->data.homeSquad);
+    //clearSquadMemory(temp->data.awaySquad);
     while (head)
     {
         Match* next = head->next;

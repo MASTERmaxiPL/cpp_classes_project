@@ -43,24 +43,28 @@ int main()
     tm* date1 = mm.createDate(10, 10, 2019);
     tm* date2 = mm.createDate(20, 11, 2019);
 
-    MatchSquadEntry* homeSquad1 = new MatchSquadEntry{1, static_cast<Position>(2), nullptr};
-    homeSquad1->next = new MatchSquadEntry{0, static_cast<Position>(0), nullptr};
-
-    MatchSquadEntry* awaySquad1 = new MatchSquadEntry{2, static_cast<Position>(0), nullptr};
-    awaySquad1->next = new MatchSquadEntry{3, static_cast<Position>(1), nullptr};
-
-    MatchSquadEntry* homeSquad2 = new MatchSquadEntry{2, static_cast<Position>(0), nullptr};
-    homeSquad2->next = new MatchSquadEntry{3, static_cast<Position>(1), nullptr};
-
-    MatchSquadEntry* awaySquad2 = new MatchSquadEntry{1, static_cast<Position>(2), nullptr};
-    awaySquad2->next = new MatchSquadEntry{2, static_cast<Position>(0), nullptr};
-
     if (date1 && home_club && away_club) {
         cout << "Creating matches..." << endl;
-        mm.match(*date1, home_club, away_club, stadiumX, -1, -1, homeSquad1, awaySquad1);
-        mm.match(*date2, away_club, home_club, stadiumX, -1, -1, awaySquad2, homeSquad2);
+        mm.match(*date1, home_club, away_club, stadiumX, -1, -1);
+        mm.match(*date2, away_club, home_club, stadiumX, -1, -1);
     }
     delete date1;
+
+    MatchListNode* matches = mm.getAllMatchesWrapped();
+    Match* match1 = mm.findMatchById(0, matches);
+    Match* match2 = mm.findMatchById(1, matches);
+
+    if (match1 && match2) {
+        mm.addPlayerToSquad(match1, 1, static_cast<Position>(2), true);
+        mm.addPlayerToSquad(match1, 0, static_cast<Position>(0), true);
+        mm.addPlayerToSquad(match1, 3, static_cast<Position>(1), false);
+        mm.addPlayerToSquad(match1, 2, static_cast<Position>(0), false);
+
+        mm.addPlayerToSquad(match2, 1, static_cast<Position>(2), false);
+        mm.addPlayerToSquad(match2, 0, static_cast<Position>(0), false);
+        mm.addPlayerToSquad(match2, 3, static_cast<Position>(1), true);
+        mm.addPlayerToSquad(match2, 2, static_cast<Position>(0), true);
+    }
 
 
     cout << "=== Matches after creation ===" << endl;
@@ -76,7 +80,6 @@ int main()
 
     // EXAMPLE 1
     // Updating match data ( moving match by 5 days and setting score )
-    MatchListNode* matches = mm.getAllMatchesWrapped();
     MatchListNode* match_node = mm.findMatchesByDate(*date2, 0, 0, 0, matches);
 
     delete date2;
