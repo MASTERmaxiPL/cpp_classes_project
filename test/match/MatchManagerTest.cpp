@@ -133,7 +133,7 @@ TEST_F(MatchManagerTest, UpdateMatch)
     mm.deleteAllWrappedMatches(list);
 }
 
-TEST(ClubManagerGetters, GetAllMatchesWrappedFromEmptyList) {
+TEST(MatchManagerGetters, GetAllMatchesWrappedFromEmptyList) {
     MatchManager mm;
 
     MatchListNode* list = mm.getAllMatchesWrapped();
