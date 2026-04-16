@@ -14,6 +14,9 @@ public:
     MatchManager();
     ~MatchManager();
 
+    MatchManager(const MatchManager& other);
+    MatchManager& operator=(const MatchManager& other);
+
     void match(const tm& date, Club* home_club, Club* away_club, Stadium* stadium, int score_home_club, int score_away_club, MatchSquadEntry* homeSquad, MatchSquadEntry* awaySquad);
     void match(const tm& date, Club* home_club, Club* away_club, Stadium* stadium, int score_home_club, int score_away_club);
     void match(const tm& date, Club* home_club, Club* away_club, Stadium* stadium);

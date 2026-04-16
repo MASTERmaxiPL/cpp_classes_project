@@ -17,6 +17,27 @@ protected:
     ClubManager sm;
 };
 
+TEST_F(ClubManagerTest, AssignmentOperation) {
+    ClubManager copy;
+    copy = sm;
+
+    Club* c1 = copy.findClubByName("Legia Warszawa");
+    EXPECT_NE(c1, nullptr);
+    EXPECT_EQ(c1->data.country, POLAND);
+    EXPECT_EQ(c1->data.founded_year, 1916);
+    EXPECT_STREQ(c1->data.city, "Warsaw");
+}
+
+TEST_F(ClubManagerTest, CopyConstructor) {
+    ClubManager copy(sm);
+
+    Club* c1 = copy.findClubByName("Legia Warszawa");
+    EXPECT_NE(c1, nullptr);
+    EXPECT_EQ(c1->data.country, POLAND);
+    EXPECT_EQ(c1->data.founded_year, 1916);
+    EXPECT_STREQ(c1->data.city, "Warsaw");
+}
+
 TEST(ClubManagerAdditionTest, AddClubToEmptyList) {
     ClubManager sm;
     sm.club("Legia Warszawa", POLAND, "Warsaw", 1916);

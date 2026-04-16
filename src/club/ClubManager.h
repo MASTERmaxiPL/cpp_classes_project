@@ -15,6 +15,9 @@ public:
     ClubManager();
     ~ClubManager();
 
+    ClubManager(const ClubManager& other);
+    ClubManager& operator=(const ClubManager& other);
+
     void club(const char* name, Country country, const char* city, int founded_year);
     void club(const char* name, Country country, const char* city);
     void club(const char* name, Country country, int founded_year);

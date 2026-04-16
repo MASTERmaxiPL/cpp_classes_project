@@ -14,6 +14,28 @@ MatchManager::~MatchManager()
     deleteAllMatches();
 }
 
+MatchManager::MatchManager(const MatchManager& other)
+{
+    head = nullptr;
+    *this = other;
+}
+
+MatchManager& MatchManager::operator=(const MatchManager& other)
+{
+    if (this == &other)
+        return *this;
+
+    deleteAllMatches();
+
+    Match* curr = other.head;
+    while (curr)
+    {
+        this->match(curr->data.date, curr->data.home_club, curr->data.away_club, curr->data.stadium, curr->data.score_home_club, curr->data.score_away_club, curr->data.homeSquad, curr->data.awaySquad);
+        curr = curr->next;
+    }
+    return *this;
+}
+
 void MatchManager::match(const tm& date, Club* home_club, Club* away_club, Stadium* stadium, const int score_home_club, const int score_away_club, MatchSquadEntry* homeSquad, MatchSquadEntry* awaySquad)
 {
     auto* newMatch = new Match;

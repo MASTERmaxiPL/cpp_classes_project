@@ -13,6 +13,28 @@ StadiumManager::~StadiumManager()
     deleteAllStadiums();
 }
 
+StadiumManager::StadiumManager(const StadiumManager& other)
+{
+    head = nullptr;
+    *this = other;
+}
+
+StadiumManager& StadiumManager::operator=(const StadiumManager& other)
+{
+    if (this == &other)
+        return *this;
+
+    deleteAllStadiums();
+
+    Stadium* curr = other.head;
+    while (curr)
+    {
+        this->stadium(curr->data.name, curr->data.country, curr->data.city, curr->data.numberOfSeats);
+        curr = curr->next;
+    }
+    return *this;
+}
+
 // --- CREATION ---
 void StadiumManager::stadium(const char* name, const Country country, const char* city, const int numberOfSeats)
 {

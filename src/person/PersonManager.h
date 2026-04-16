@@ -18,6 +18,9 @@ public:
     PersonManager();
     ~PersonManager();
 
+    PersonManager(const PersonManager& other);
+    PersonManager& operator=(const PersonManager& other);
+
     void player(const char* name, const char* surname, int age, Country nationality, Position position);
     void staff(const char* name, const char* surname, int age, Country nationality, Role role);
 

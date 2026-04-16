@@ -14,6 +14,9 @@ public:
     StadiumManager();
     ~StadiumManager();
 
+    StadiumManager(const StadiumManager& other);
+    StadiumManager& operator=(const StadiumManager& other);
+
     void stadium(const char* name, Country country, const char* city, int numberOfSeats);
     void stadium(const char* name, Country country, const char* city);
 

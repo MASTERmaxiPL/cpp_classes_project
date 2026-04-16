@@ -15,6 +15,37 @@ PersonManager::~PersonManager()
     deleteAllPeople();
 }
 
+PersonManager::PersonManager(const PersonManager& other)
+{
+    head = nullptr;
+    *this = other;
+}
+
+PersonManager& PersonManager::operator=(const PersonManager& other)
+{
+    if (this == &other)
+        return *this;
+
+    deleteAllPeople();
+
+    Person* curr = other.head;
+    while (curr)
+    {
+        if (dynamic_cast<Player*>(curr))
+        {
+            const auto* player_person = dynamic_cast<Player*>(curr);
+            this->player(player_person->data.name, player_person->data.surname, player_person->data.age, player_person->data.nationality, player_person->position);
+        }
+        else if (dynamic_cast<Staff*>(curr))
+        {
+            const auto* staff_person = dynamic_cast<Staff*>(curr);
+            this->staff(staff_person->data.name, staff_person->data.surname, staff_person->data.age, staff_person->data.nationality, staff_person->role);
+        }
+        curr = curr->next;
+    }
+    return *this;
+}
+
 void PersonManager::player(const char* name, const char* surname, const int age, const Country nationality, const Position position)
 {
     if (!name || !surname)

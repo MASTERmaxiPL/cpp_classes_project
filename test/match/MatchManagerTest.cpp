@@ -63,6 +63,35 @@ protected:
     Stadium *stadium_1 = new Stadium;
 };
 
+TEST_F(MatchManagerTest, AssignmentOperation) {
+    MatchManager copy;
+    copy = mm;
+
+    auto* list = copy.getAllMatchesWrapped();
+    EXPECT_NE(list, nullptr);
+    EXPECT_NE(list->next, nullptr);
+    EXPECT_NE(list->next->next, nullptr);
+    EXPECT_NE(list->next->next->next, nullptr);
+    EXPECT_NE(list->next->next->next->next, nullptr);
+    EXPECT_EQ(list->next->next->next->next->next, nullptr);
+
+    copy.deleteAllWrappedMatches(list);
+}
+
+TEST_F(MatchManagerTest, CopyConstructor) {
+    MatchManager copy(mm);
+
+    auto* list = copy.getAllMatchesWrapped();
+    EXPECT_NE(list, nullptr);
+    EXPECT_NE(list->next, nullptr);
+    EXPECT_NE(list->next->next, nullptr);
+    EXPECT_NE(list->next->next->next, nullptr);
+    EXPECT_NE(list->next->next->next->next, nullptr);
+    EXPECT_EQ(list->next->next->next->next->next, nullptr);
+
+    copy.deleteAllWrappedMatches(list);
+}
+
 TEST(MatchManagerAdditionTest, AddMatchToEmptyList) {
     MatchManager mm;
     auto* stadium = new Stadium;

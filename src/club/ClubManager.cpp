@@ -13,6 +13,28 @@ ClubManager::~ClubManager()
     deleteAllClubs();
 }
 
+ClubManager::ClubManager(const ClubManager& other)
+{
+    head = nullptr;
+    *this = other;
+}
+
+ClubManager& ClubManager::operator=(const ClubManager& other)
+{
+    if (this == &other)
+        return *this;
+
+    deleteAllClubs();
+
+    Club* curr = other.head;
+    while (curr)
+    {
+        this->club(curr->data.name, curr->data.country, curr->data.city, curr->data.founded_year);
+        curr = curr->next;
+    }
+    return *this;
+}
+
 // --- CREATION ---
 void ClubManager::club(const char* name, const Country country) {
     club(name, country, nullptr, -1);

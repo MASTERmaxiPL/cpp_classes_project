@@ -17,6 +17,27 @@ class StadiumManagerTest : public testing::Test
     StadiumManager sm;
 };
 
+TEST_F(StadiumManagerTest, AssignmentOperation) {
+    StadiumManager copy;
+    copy = sm;
+
+    Stadium* s1 = copy.findStadiumByName("Stadion Narodowy");
+    EXPECT_NE(s1, nullptr);
+    EXPECT_EQ(s1->data.country, POLAND);
+    EXPECT_EQ(s1->data.numberOfSeats, 100000);
+    EXPECT_STREQ(s1->data.city, "Warsaw");
+}
+
+TEST_F(StadiumManagerTest, CopyConstructor) {
+    StadiumManager copy(sm);
+
+    Stadium* s1 = copy.findStadiumByName("Stadion Narodowy");
+    EXPECT_NE(s1, nullptr);
+    EXPECT_EQ(s1->data.country, POLAND);
+    EXPECT_EQ(s1->data.numberOfSeats, 100000);
+    EXPECT_STREQ(s1->data.city, "Warsaw");
+}
+
 TEST(StadiumManagerAdditionTest, AddStadiumToEmptyList) {
     StadiumManager sm;
     sm.stadium("Stadion Miejski Legii Warszawa", POLAND, "Warsaw", 80000);

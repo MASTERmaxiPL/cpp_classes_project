@@ -19,6 +19,37 @@ class PersonManagerTest : public testing::Test
     PersonManager pm;
 };
 
+TEST_F(PersonManagerTest, AssignmentOperation) {
+    PersonManager copy;
+    copy = pm;
+
+    PersonListNode* list = copy.getAllPeopleWrapped();
+    EXPECT_NE(list, nullptr);
+    EXPECT_NE(list->next, nullptr);
+    EXPECT_NE(list->next->next, nullptr);
+    EXPECT_NE(list->next->next->next, nullptr);
+    EXPECT_NE(list->next->next->next->next, nullptr);
+    EXPECT_NE(list->next->next->next->next->next, nullptr);
+    EXPECT_EQ(list->next->next->next->next->next->next, nullptr);
+
+    copy.deleteAllWrappedPeople(list);
+}
+
+TEST_F(PersonManagerTest, CopyConstructor) {
+    PersonManager copy(pm);
+
+    PersonListNode* list = copy.getAllPeopleWrapped();
+    EXPECT_NE(list, nullptr);
+    EXPECT_NE(list->next, nullptr);
+    EXPECT_NE(list->next->next, nullptr);
+    EXPECT_NE(list->next->next->next, nullptr);
+    EXPECT_NE(list->next->next->next->next, nullptr);
+    EXPECT_NE(list->next->next->next->next->next, nullptr);
+    EXPECT_EQ(list->next->next->next->next->next->next, nullptr);
+
+    copy.deleteAllWrappedPeople(list);
+}
+
 TEST(PersonManagerAdditionTest, AddPersonToEmptyList)
 {
     PersonManager pm;
