@@ -421,6 +421,7 @@ void PersonManager::displayPerson(const Person* person)
     {
         cout << "| role: " << staff->role;
     }
+    cout << endl;
 }
 
 void PersonManager::displayPeopleList() const
@@ -451,7 +452,7 @@ void PersonManager::displayWrappedPeopleList(PersonListNode* wrapped_person)
 
     PersonListNode* curr = wrapped_person;
 
-    cout << "Stadiums List" << endl;
+    cout << "People List" << endl;
     while (curr)
     {
         displayWrappedPerson(curr);

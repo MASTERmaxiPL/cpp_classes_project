@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include "MatchManager.h"
 
 #include "../club/Club.h"
@@ -435,9 +436,9 @@ void MatchManager::displayMatch(const Match* match)
          << (month < 10 ? "0" : "") << month << "/"
          << year << endl;
 
-    cout << "Home Club: " << match->data.home_club->data.name << endl;
-    cout << "Away Club: " << match->data.away_club->data.name << endl;
-    cout << "Stadium: " << match->data.stadium->data.name << endl;
+    cout << "Home Club: " << (match->data.home_club ? match->data.home_club->data.name : string("nullptr")) << endl;
+    cout << "Away Club: " << (match->data.away_club ? match->data.away_club->data.name : string("nullptr")) << endl;
+    cout << "Stadium: " << (match->data.stadium ? match->data.stadium->data.name : string("nullptr")) << endl;
     if (match->data.score_home_club != -1 && match->data.score_away_club != -1)
         cout << "Score: " << match->data.score_home_club << " - " << match->data.score_away_club << endl;
 }

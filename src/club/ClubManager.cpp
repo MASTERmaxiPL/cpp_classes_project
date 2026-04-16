@@ -90,7 +90,7 @@ void ClubManager::club(const char* name, const Country country, const char* city
         newClub->data.city = nullptr;
     else
     {
-        newClub->data.city = new char[strlen(name) +1];
+        newClub->data.city = new char[strlen(city) +1];
         strcpy(newClub->data.city, city);
     }
 
@@ -376,7 +376,7 @@ void ClubManager::displayClub(const Club *club) {
 
     cout << club->data.name << ": " << club->data.country << ", " << club->data.city <<
         ", founded in" << club->data.founded_year << endl;
-    cout << "Number of stadiums:" << getClubPlayersCount(club) <<  endl;
+    cout << "Number of stadiums:" << getClubStadiumsCount(club) <<  endl;
     cout << "Number of players:" << getClubPlayersCount(club) << endl;
     cout << "Number of staff:" << getClubStaffCount(club) << endl;
 }
