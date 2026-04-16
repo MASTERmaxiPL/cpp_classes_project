@@ -4,14 +4,16 @@
 #pragma once
 
 #include "Stadium.h"
+#include "match/MatchManager.h"
 
 class StadiumManager
 {
     Stadium* head;
+    MatchManager* matchManager;
 
-    static void clearStadiumMemory(Stadium* stadium);
+    void clearStadiumMemory(const Stadium* stadium) const;
 public:
-    StadiumManager();
+    explicit StadiumManager(MatchManager* matchManager = nullptr);
     ~StadiumManager();
 
     StadiumManager(const StadiumManager& other);
@@ -41,6 +43,8 @@ public:
 
     static void displayWrappedStadium(const StadiumListNode* wrapped_stadium);
     static void displayWrappedStadiumList(StadiumListNode* wrapped_stadium);
+
+    void setMatchManager(MatchManager* mgr);
 };
 
 #endif

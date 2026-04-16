@@ -2,17 +2,19 @@
 #define FOOTBALL_MANAGEMENT_SYSTEM_CLUB_MANAGER_H
 
 #import "Club.h"
+#include "match/MatchManager.h"
 #include "person/Player.h"
 
 
 class ClubManager {
     Club* head;
+    MatchManager* matchManager;
 
-    static void clearClubMemory(Club* club);
     static void deleteAllWrappedClubStadiums(StadiumListNode*& head);
     static void deleteAllWrappedClubPeople(PersonListNode*& head);
+    void clearClubMemory(Club* club) const;
 public:
-    ClubManager();
+    ClubManager(MatchManager* matchManager = nullptr);
     ~ClubManager();
 
     ClubManager(const ClubManager& other);
@@ -56,6 +58,8 @@ public:
     static int getClubStadiumsCount(const Club* club);
     static int getClubPlayersCount(const Club* club);
     static int getClubStaffCount(const Club* club);
+
+    void setMatchManager(MatchManager* mgr);
 };
 
 

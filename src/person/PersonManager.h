@@ -6,16 +6,17 @@
 #include "Player.h"
 #include "Staff.h"
 #include "../utils/Country.h"
+#include "match/MatchManager.h"
 #include "utils/IdGenerator.h"
-
 
 class PersonManager {
     Person* head;
     IdGenerator idGen;
+    MatchManager* matchManager;
 
     static void clearPersonMemory(Person* person);
 public:
-    PersonManager();
+    explicit PersonManager(MatchManager* matchManager = nullptr);
     ~PersonManager();
 
     PersonManager(const PersonManager& other);
@@ -52,6 +53,8 @@ public:
 
     static void displayWrappedPerson(const PersonListNode* wrapped_person);
     static void displayWrappedPeopleList(PersonListNode* wrapped_person);
+
+    void setMatchManager(MatchManager* mgr);
 };
 
 

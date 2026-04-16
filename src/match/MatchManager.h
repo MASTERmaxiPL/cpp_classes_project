@@ -46,6 +46,10 @@ public:
 
     static void displayWrappedMatch(const MatchListNode* wrapped_match);
     static void displayWrappedMatchesList(MatchListNode* head);
+
+    void removeClubFromMatchData(const Club* club) const;
+    void removeStadiumFromMatchData(const Stadium* stadium) const;
+    void removePersonFromMatchData(uint32_t personId) const;
 };
 
 

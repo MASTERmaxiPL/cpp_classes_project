@@ -3,14 +3,12 @@
 
 #include "PersonManager.h"
 #include "club/ClubManager.h"
+#include "../match/MatchManager.h"
 
 using namespace std;
 
 // --- CONSTRUCTORS & DESTRUCTORS ---
-PersonManager::PersonManager() : head(nullptr)
-{
-    idGen = IdGenerator();
-}
+PersonManager::PersonManager(MatchManager* matchManager) : head(nullptr), idGen(IdGenerator()), matchManager(matchManager) {}
 
 PersonManager::~PersonManager()
 {
@@ -20,6 +18,7 @@ PersonManager::~PersonManager()
 PersonManager::PersonManager(const PersonManager& other)
 {
     head = nullptr;
+    matchManager = other.matchManager;
     *this = other;
 }
 
@@ -29,6 +28,8 @@ PersonManager& PersonManager::operator=(const PersonManager& other)
         return *this;
 
     deleteAllPeople();
+
+    this->matchManager = other.matchManager;
 
     Person* curr = other.head;
     while (curr)
@@ -160,6 +161,12 @@ PersonListNode* PersonManager::getAllPeopleWrapped() const
     }
 
     return result;
+}
+
+// setter/getter dla matchManager
+void PersonManager::setMatchManager(MatchManager* mgr)
+{
+    this->matchManager = mgr;
 }
 
 // --- FILTERS ---
@@ -316,6 +323,10 @@ bool PersonManager::deletePerson(uint32_t personId)
         {
             ClubManager::removePersonFromClub(temp, temp->hiredBy);
         }
+
+        if (this->matchManager)
+            this->matchManager->removePersonFromMatchData(temp->id);
+
         clearPersonMemory(temp);
         return true;
     }
@@ -332,6 +343,10 @@ bool PersonManager::deletePerson(uint32_t personId)
         {
             ClubManager::removePersonFromClub(temp, temp->hiredBy);
         }
+
+        if (this->matchManager)
+            this->matchManager->removePersonFromMatchData(temp->id);
+
         clearPersonMemory(temp);
         return true;
     }

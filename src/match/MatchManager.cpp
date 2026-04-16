@@ -40,6 +40,17 @@ MatchManager& MatchManager::operator=(const MatchManager& other)
 // --- CREATION ---
 void MatchManager::match(const tm& date, Club* home_club, Club* away_club, Stadium* stadium, const int score_home_club, const int score_away_club, MatchSquadEntry* homeSquad, MatchSquadEntry* awaySquad)
 {
+    if (home_club == nullptr || away_club == nullptr)
+    {
+        cerr << "Home club and away club cannot be null." << endl;
+        return;
+    }
+    if (home_club == away_club)
+    {
+        cerr << "Home club and away club cannot be the same." << endl;
+        return;
+    }
+
     auto* newMatch = new Match;
 
     newMatch->id = idGen.generateId();
@@ -109,10 +120,14 @@ void MatchManager::updateMatch(Match* match, const tm& date, Club* home_club, Cl
     if (!match)
         return;
 
+    if (home_club == away_club)
+        if (home_club)
+            return;
+
     match->data.date = date;
     if (home_club)
         match->data.home_club = home_club;
-    if (away_club)
+    if (away_club && away_club != match->data.home_club)
         match->data.away_club = away_club;
     if (stadium)
         match->data.stadium = stadium;
@@ -336,6 +351,69 @@ void MatchManager::deleteAllWrappedMatches(MatchListNode*& head)
         MatchListNode* next = head->next;
         delete head;
         head = next;
+    }
+}
+
+static void removeSquadEntriesByPlayerId(MatchSquadEntry*& head, uint32_t playerId)
+{
+    MatchSquadEntry** curPtr = &head;
+    while (*curPtr)
+    {
+        if ((*curPtr)->player_id == playerId)
+        {
+            MatchSquadEntry* tmp = *curPtr;
+            *curPtr = tmp->next;
+            delete tmp;
+        }
+        else
+        {
+            curPtr = &((*curPtr)->next);
+        }
+    }
+}
+
+void MatchManager::removeClubFromMatchData(const Club* club) const
+{
+    if (!club) return;
+
+    Match* curr = head;
+    while (curr)
+    {
+        if (curr->data.home_club == club)
+        {
+            curr->data.home_club = nullptr;
+        }
+        else if (curr->data.away_club == club)
+        {
+            curr->data.away_club = nullptr;
+        }
+        curr = curr->next;
+    }
+}
+
+void MatchManager::removeStadiumFromMatchData(const Stadium* stadium) const
+{
+    if (!stadium) return;
+
+    Match* curr = head;
+    while (curr)
+    {
+        if (curr->data.stadium == stadium)
+        {
+            curr->data.stadium = nullptr;
+        }
+        curr = curr->next;
+    }
+}
+
+void MatchManager::removePersonFromMatchData(const uint32_t personId) const
+{
+    Match* curr = head;
+    while (curr)
+    {
+        removeSquadEntriesByPlayerId(curr->data.homeSquad, personId);
+        removeSquadEntriesByPlayerId(curr->data.awaySquad, personId);
+        curr = curr->next;
     }
 }
 

@@ -3,11 +3,12 @@
 
 #include <cstring>
 #include "club/ClubManager.h"
+#include "../match/MatchManager.h"
 
 using namespace std;
 
 // --- CONSTRUCTORS & DESTRUCTORS ---
-StadiumManager::StadiumManager() : head(nullptr) {}
+StadiumManager::StadiumManager(MatchManager* matchManager) : head(nullptr), matchManager(matchManager) {}
 
 StadiumManager::~StadiumManager()
 {
@@ -17,6 +18,7 @@ StadiumManager::~StadiumManager()
 StadiumManager::StadiumManager(const StadiumManager& other)
 {
     head = nullptr;
+    matchManager = other.matchManager;
     *this = other;
 }
 
@@ -26,6 +28,8 @@ StadiumManager& StadiumManager::operator=(const StadiumManager& other)
         return *this;
 
     deleteAllStadiums();
+
+    this->matchManager = other.matchManager;
 
     Stadium* curr = other.head;
     while (curr)
@@ -97,6 +101,12 @@ StadiumListNode* StadiumManager::getAllStadiumsWrapped() const
     }
 
     return result;
+}
+
+// setter/getter dla matchManager
+void StadiumManager::setMatchManager(MatchManager* mgr)
+{
+    this->matchManager = mgr;
 }
 
 // --- FILTERS ---
@@ -201,10 +211,13 @@ StadiumListNode* StadiumManager::findStadiumsByMaxSeats(const int maxSeats, Stad
 }
 
 // --- DELETION ---
-void StadiumManager::clearStadiumMemory(Stadium* stadium)
+void StadiumManager::clearStadiumMemory(const Stadium* stadium) const
 {
     if (stadium)
     {
+        if (this->matchManager)
+            this->matchManager->removeStadiumFromMatchData(stadium);
+
         delete[] stadium->data.name;
         delete[] stadium->data.city;
         delete stadium;

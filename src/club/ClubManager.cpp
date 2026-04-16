@@ -5,11 +5,12 @@
 
 #include "../person/PersonManager.h"
 #include "../stadium/StadiumManager.h"
+#include "../match/MatchManager.h"
 
 using namespace std;
 
 // --- CONSTRUCTORS & DESTRUCTORS ---
-ClubManager::ClubManager() : head(nullptr) {}
+ClubManager::ClubManager(MatchManager* matchManager) : head(nullptr), matchManager(matchManager) {}
 
 ClubManager::~ClubManager()
 {
@@ -19,6 +20,7 @@ ClubManager::~ClubManager()
 ClubManager::ClubManager(const ClubManager& other)
 {
     head = nullptr;
+    matchManager = other.matchManager;
     *this = other;
 }
 
@@ -28,6 +30,8 @@ ClubManager& ClubManager::operator=(const ClubManager& other)
         return *this;
 
     deleteAllClubs();
+
+    this->matchManager = other.matchManager;
 
     Club* curr = other.head;
     while (curr)
@@ -110,6 +114,12 @@ ClubListNode* ClubManager::getAllClubsWrapped() const
     }
 
     return result;
+}
+
+// setter/getter dla matchManager
+void ClubManager::setMatchManager(MatchManager* mgr)
+{
+    this->matchManager = mgr;
 }
 
 // --- FILTERS ---
@@ -248,10 +258,13 @@ void ClubManager::deleteAllWrappedClubPeople(PersonListNode*& head)
     }
 }
 
-void ClubManager::clearClubMemory(Club* club)
+void ClubManager::clearClubMemory(Club* club) const
 {
     if (club)
     {
+        if (this->matchManager)
+            matchManager->removeClubFromMatchData(club);
+
         StadiumListNode* sCurr = club->data.stadium;
         while (sCurr)
         {
