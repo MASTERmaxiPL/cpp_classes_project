@@ -39,6 +39,16 @@ TEST(ClubManagerAdditionTest, AddClubToExistingList) {
     EXPECT_EQ(c2->next, nullptr);
 }
 
+TEST_F(ClubManagerTest, EditExistingClub) {
+    sm.club("Legia Warszawa", POLAND, "Warszawa", 1912);
+
+    Club* c1 = sm.findClubByName("Legia Warszawa");
+    EXPECT_NE(c1, nullptr);
+    EXPECT_EQ(c1->data.country, POLAND);
+    EXPECT_EQ(c1->data.founded_year, 1912);
+    EXPECT_STREQ(c1->data.city, "Warszawa");
+}
+
 TEST(ClubManagerGetters, GetAllClubsWrappedFromEmptyList) {
     ClubManager sm;
 

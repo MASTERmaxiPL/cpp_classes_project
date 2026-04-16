@@ -15,58 +15,41 @@ ClubManager::~ClubManager()
 
 // --- CREATION ---
 void ClubManager::club(const char* name, const Country country) {
-    auto newClub = new Club;
-
-    newClub->data.name = new char[strlen(name) +1];
-    strcpy(newClub->data.name, name);
-
-    newClub->data.country = country;
-
-    newClub->data.city = nullptr;
-
-    newClub->data.founded_year = 0;
-
-    Club* curr = head;
-    head = newClub;
-    head->next = curr;
+    club(name, country, nullptr, -1);
 }
 
 void ClubManager::club(const char* name, const Country country, const char* city) {
-    auto newClub = new Club;
-
-    newClub->data.name = new char[strlen(name) +1];
-    strcpy(newClub->data.name, name);
-
-    newClub->data.country = country;
-
-    newClub->data.city = new char[strlen(name) +1];
-    strcpy(newClub->data.city, city);
-
-    newClub->data.founded_year = 0;
-
-    Club* curr = head;
-    head = newClub;
-    head->next = curr;
+    club(name, country, city, -1);
 }
 
 void ClubManager::club(const char* name, const Country country, const int founded_year) {
-    auto newClub = new Club;
-
-    newClub->data.name = new char[strlen(name) +1];
-    strcpy(newClub->data.name, name);
-
-    newClub->data.country = country;
-
-    newClub->data.city = nullptr;
-
-    newClub->data.founded_year = founded_year;
-
-    Club* curr = head;
-    head = newClub;
-    head->next = curr;
+    club(name, country, nullptr, founded_year);
 }
 
 void ClubManager::club(const char* name, const Country country, const char* city, const int founded_year) {
+    if (!name)
+        return;
+
+    Club* curr = head;
+    while (curr)
+    {
+        if (strcmp(curr->data.name, name) == 0)
+        {
+            cout << "Club with name " << name << " already exists. Club data will be edited" << endl;
+            curr->data.country = country;
+            if (founded_year != -1)
+                curr->data.founded_year = founded_year;
+            if (city)
+            {
+                delete [] curr->data.city;
+                curr->data.city = new char[strlen(city) +1];
+                strcpy(curr->data.city, city);
+            }
+            return;
+        }
+        curr = curr->next;
+    }
+
     auto newClub = new Club;
 
     newClub->data.name = new char[strlen(name) +1];
@@ -74,12 +57,17 @@ void ClubManager::club(const char* name, const Country country, const char* city
 
     newClub->data.country = country;
 
-    newClub->data.city = new char[strlen(name) +1];
-    strcpy(newClub->data.city, city);
+    if (!city)
+        newClub->data.city = nullptr;
+    else
+    {
+        newClub->data.city = new char[strlen(name) +1];
+        strcpy(newClub->data.city, city);
+    }
 
     newClub->data.founded_year = founded_year;
 
-    Club* curr = head;
+    curr = head;
     head = newClub;
     head->next = curr;
 }
