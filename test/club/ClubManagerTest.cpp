@@ -1,4 +1,3 @@
-#include <codecvt>
 #include <gtest/gtest.h>
 
 #include "../../src/club/ClubManager.h"
