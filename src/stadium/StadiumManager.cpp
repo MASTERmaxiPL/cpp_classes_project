@@ -2,6 +2,7 @@
 #include "StadiumManager.h"
 
 #include <cstring>
+#include "club/ClubManager.h"
 
 using namespace std;
 
@@ -218,6 +219,11 @@ bool StadiumManager::deleteStadium(Stadium* stadium)
     {
         Stadium* temp = head;
         head = stadium->next;
+
+        if (temp->ownedBy)
+        {
+            ClubManager::removeStadiumFromClub(temp, temp->ownedBy);
+        }
         clearStadiumMemory(temp);
         return true;
     }
@@ -228,6 +234,11 @@ bool StadiumManager::deleteStadium(Stadium* stadium)
     if (prev)
     {
         prev->next = stadium->next;
+
+        if (stadium->ownedBy)
+        {
+            ClubManager::removeStadiumFromClub(stadium, stadium->ownedBy);
+        }
         clearStadiumMemory(stadium);
         return true;
     }

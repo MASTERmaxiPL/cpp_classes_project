@@ -2,6 +2,8 @@
 
 #include "../../src/club/ClubManager.h"
 #include "../../src/utils/Country.h"
+#include "person/PersonManager.h"
+#include "stadium/StadiumManager.h"
 
 class ClubManagerTest : public testing::Test
 {
@@ -469,4 +471,40 @@ TEST_F(ClubManagerTest, GetClubStaffCountWithExistingList)
 
     delete staff1;
     delete staff2;
+}
+
+TEST_F(ClubManagerTest, RemovePersonAndStadiumFromClub)
+{
+    Club* club = sm.findClubByName("Legia Warszawa");
+    ASSERT_NE(club, nullptr);
+
+    PersonManager pm;
+    pm.player("CClub", "Member", 25, POLAND, FORWARD);
+    PersonListNode* plist = pm.getAllPeopleWrapped();
+    Person* p = pm.findPersonById(0, plist);
+    ASSERT_NE(p, nullptr);
+
+    StadiumManager stm;
+    stm.stadium("ClubStadium", POLAND, "Warsaw", 20000);
+    StadiumListNode* slist = stm.getAllStadiumsWrapped();
+    Stadium* s = stm.findStadiumByNameInWrapper("ClubStadium", slist);
+    ASSERT_NE(s, nullptr);
+
+    sm.addPlayerToClub(dynamic_cast<Player*>(p), club);
+    sm.addStadiumToClub(s, club);
+
+    EXPECT_EQ(sm.getClubPlayersCount(club), 1);
+    EXPECT_EQ(sm.getClubStadiumsCount(club), 1);
+
+    bool pr = sm.removePersonFromClub(p, club);
+    bool sr = sm.removeStadiumFromClub(s, club);
+
+    EXPECT_TRUE(pr);
+    EXPECT_TRUE(sr);
+
+    EXPECT_EQ(sm.getClubPlayersCount(club), 0);
+    EXPECT_EQ(sm.getClubStadiumsCount(club), 0);
+
+    pm.deleteAllWrappedPeople(plist);
+    stm.deleteAllWrappedStadiums(slist);
 }

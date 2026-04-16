@@ -3,11 +3,11 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 
 #include "../utils/Country.h"
 
 using namespace std;
+struct Club;
 
 struct PersonData {
     char* name;
@@ -19,6 +19,7 @@ struct PersonData {
 struct Person {
     uint32_t id{};
     PersonData data{};
+    Club* hiredBy{nullptr};
     Person* next{nullptr};
 
     virtual ~Person() = default;

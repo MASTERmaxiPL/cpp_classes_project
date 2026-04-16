@@ -2,6 +2,7 @@
 
 #include "../../src/person/PersonManager.h"
 #include "../../src/utils/Country.h"
+#include "club/ClubManager.h"
 
 class PersonManagerTest : public testing::Test
 {
@@ -362,6 +363,80 @@ TEST_F(PersonManagerTest, DisplayWrappedPeopleList)
     ASSERT_NE(output.find("Nunca"), std::string::npos);
     ASSERT_NE(output.find("Zinedine"), std::string::npos);
     ASSERT_NE(output.find("Zidane"), std::string::npos);
+
+    pm.deleteAllWrappedPeople(list);
+}
+
+TEST(PersonManagerClubIntegrationTest, DeletePersonRemovesFromClub)
+{
+    ClubManager cm;
+    cm.club("TestClub", POLAND, "City", 1900);
+    Club* club = cm.findClubByName("TestClub");
+    ASSERT_NE(club, nullptr);
+
+    PersonManager pm;
+    pm.player("Test", "Player", 28, POLAND, MIDFIELDER);
+
+    PersonListNode* list = pm.getAllPeopleWrapped();
+    Person* p = nullptr;
+    for (PersonListNode* it = list; it != nullptr; it = it->next)
+    {
+        if (strcmp(it->person->data.name, "Test") == 0 && strcmp(it->person->data.surname, "Player") == 0)
+        {
+            p = it->person;
+            break;
+        }
+    }
+    ASSERT_NE(p, nullptr);
+
+    // add player to club
+    cm.addPlayerToClub(dynamic_cast<Player*>(p), club);
+    EXPECT_EQ(cm.getClubPlayersCount(club), 1);
+
+    // delete person (should remove from club inside deletePerson)
+    const bool success = pm.deletePerson(p->id);
+    EXPECT_TRUE(success);
+
+    // wrapper in club should be removed
+    EXPECT_EQ(cm.getClubPlayersCount(club), 0);
+
+    pm.deleteAllWrappedPeople(list);
+}
+
+TEST(PersonManagerClubIntegrationTest, DeleteWrappedPersonDoesNotRemoveHiredBy)
+{
+    ClubManager cm;
+    cm.club("TestClub2", POLAND, "City", 1901);
+    Club* club = cm.findClubByName("TestClub2");
+    ASSERT_NE(club, nullptr);
+
+    PersonManager pm;
+    pm.player("Wrapped", "Player", 30, POLAND, MIDFIELDER);
+
+    PersonListNode* list = pm.getAllPeopleWrapped();
+    Person* p = nullptr;
+    for (PersonListNode* it = list; it != nullptr; it = it->next)
+    {
+        if (strcmp(it->person->data.name, "Wrapped") == 0)
+        {
+            p = it->person;
+            break;
+        }
+    }
+    ASSERT_NE(p, nullptr);
+
+    // add to club
+    cm.addPlayerToClub(dynamic_cast<Player*>(p), club);
+    EXPECT_EQ(cm.getClubPlayersCount(club), 1);
+    EXPECT_EQ(p->hiredBy, club);
+
+    // remove only wrapper from the wrapped-list (should not affect the club or hiredBy)
+    bool removed = PersonManager::deleteWrappedPerson(list, p->id);
+    EXPECT_TRUE(removed);
+
+    // club should still reference the player (playersHead not affected)
+    EXPECT_EQ(cm.getClubPlayersCount(club), 1);
+    EXPECT_EQ(p->hiredBy, club);
 
     pm.deleteAllWrappedPeople(list);
 }

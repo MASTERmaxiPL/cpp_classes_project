@@ -2,6 +2,7 @@
 #include <cstring>
 
 #include "PersonManager.h"
+#include "club/ClubManager.h"
 
 using namespace std;
 
@@ -310,6 +311,11 @@ bool PersonManager::deletePerson(uint32_t personId)
     {
         Person* temp = head;
         head = head->next;
+
+        if (temp->hiredBy)
+        {
+            ClubManager::removePersonFromClub(temp, temp->hiredBy);
+        }
         clearPersonMemory(temp);
         return true;
     }
@@ -321,6 +327,11 @@ bool PersonManager::deletePerson(uint32_t personId)
     {
         Person* temp = prev->next;
         prev->next = prev->next->next;
+
+        if (temp->hiredBy)
+        {
+            ClubManager::removePersonFromClub(temp, temp->hiredBy);
+        }
         clearPersonMemory(temp);
         return true;
     }

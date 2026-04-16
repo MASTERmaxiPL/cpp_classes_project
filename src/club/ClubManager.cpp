@@ -3,6 +3,9 @@
 #include <iostream>
 #include <cstring>
 
+#include "../person/PersonManager.h"
+#include "../stadium/StadiumManager.h"
+
 using namespace std;
 
 // --- CONSTRUCTORS & DESTRUCTORS ---
@@ -249,6 +252,30 @@ void ClubManager::clearClubMemory(Club* club)
 {
     if (club)
     {
+        StadiumListNode* sCurr = club->data.stadium;
+        while (sCurr)
+        {
+            if (sCurr->stadium)
+                sCurr->stadium->ownedBy = nullptr;
+            sCurr = sCurr->next;
+        }
+
+        PersonListNode* pCurr = club->data.playersHead;
+        while (pCurr)
+        {
+            if (pCurr->person)
+                pCurr->person->hiredBy = nullptr;
+            pCurr = pCurr->next;
+        }
+
+        PersonListNode* stCurr = club->data.staffHead;
+        while (stCurr)
+        {
+            if (stCurr->person)
+                stCurr->person->hiredBy = nullptr;
+            stCurr = stCurr->next;
+        }
+
         delete[] club->data.name;
         delete[] club->data.city;
 
@@ -384,6 +411,7 @@ void ClubManager::addStadiumToClub(Stadium* stadium, Club* club)
 
     StadiumListNode* temp = club->data.stadium;
     club->data.stadium = new StadiumListNode{stadium, temp};
+    stadium->ownedBy = club;
 }
 
 void ClubManager::addPlayerToClub(Player* player, Club* club)
@@ -393,6 +421,7 @@ void ClubManager::addPlayerToClub(Player* player, Club* club)
 
     PersonListNode* temp = club->data.playersHead;
     club->data.playersHead = new PersonListNode{player, temp};
+    player->hiredBy = club;
 }
 
 void ClubManager::addStaffToClub(Staff* staff, Club* club)
@@ -402,6 +431,44 @@ void ClubManager::addStaffToClub(Staff* staff, Club* club)
 
     PersonListNode* temp = club->data.staffHead;
     club->data.staffHead = new PersonListNode{staff, temp};
+    staff->hiredBy = club;
+}
+
+bool ClubManager::removeStadiumFromClub(Stadium* stadium, Club* club)
+{
+    if (!stadium || !club)
+        return false;
+
+    if (StadiumManager::deleteWrappedStadium(club->data.stadium, stadium))
+    {
+        stadium->ownedBy = nullptr;
+        return true;
+    }
+    return false;
+}
+
+bool ClubManager::removePersonFromClub(Person* person, Club* club)
+{
+    if (!person || !club)
+        return false;
+
+    if (club->data.playersHead)
+    {
+        if (PersonManager::deleteWrappedPerson(club->data.playersHead, person->id)){
+            person->hiredBy = nullptr;
+            return true;
+        }
+    }
+
+    if (club->data.staffHead)
+    {
+        if (PersonManager::deleteWrappedPerson(club->data.staffHead, person->id))
+        {
+            person->hiredBy = nullptr;
+            return true;
+        }
+    }
+    return false;
 }
 
 int ClubManager::getClubStadiumsCount(const Club* club)

@@ -2,6 +2,7 @@
 
 #include "../../src/stadium/StadiumManager.h"
 #include "../../src/utils/Country.h"
+#include "club/ClubManager.h"
 
 class StadiumManagerTest : public testing::Test
 {
@@ -305,6 +306,61 @@ TEST_F(StadiumManagerTest, DisplayWrappedStadiumList)
     ASSERT_NE(output.find("Allianz Arena"), std::string::npos);
     ASSERT_NE(output.find("Stadion Narodowy"), std::string::npos);
     ASSERT_NE(output.find("Stadion Miejski Legii Warszawa"), std::string::npos);
+
+    sm.deleteAllWrappedStadiums(list);
+}
+
+TEST(StadiumManagerClubIntegrationTest, DeleteStadiumRemovesFromClub)
+{
+    ClubManager cm;
+    cm.club("ClubS", POLAND, "CityS", 1950);
+    Club* club = cm.findClubByName("ClubS");
+    ASSERT_NE(club, nullptr);
+
+    StadiumManager sm;
+    sm.stadium("S1", POLAND, "CityS", 10000);
+
+    StadiumListNode* list = sm.getAllStadiumsWrapped();
+    Stadium* s = sm.findStadiumByNameInWrapper("S1", list);
+    ASSERT_NE(s, nullptr);
+
+    cm.addStadiumToClub(s, club);
+    EXPECT_EQ(cm.getClubStadiumsCount(club), 1);
+    EXPECT_EQ(s->ownedBy, club);
+
+    const bool success = sm.deleteStadium(s);
+    EXPECT_TRUE(success);
+
+    EXPECT_EQ(cm.getClubStadiumsCount(club), 0);
+
+    sm.deleteAllWrappedStadiums(list);
+}
+
+TEST(StadiumManagerClubIntegrationTest, DeleteWrappedStadiumDoesNotRemoveOwnership)
+{
+    ClubManager cm;
+    cm.club("ClubS2", POLAND, "CityS2", 1951);
+    Club* club = cm.findClubByName("ClubS2");
+    ASSERT_NE(club, nullptr);
+
+    StadiumManager sm;
+    sm.stadium("SW", POLAND, "CityS2", 5000);
+
+    StadiumListNode* list = sm.getAllStadiumsWrapped();
+    Stadium* s = sm.findStadiumByNameInWrapper("SW", list);
+    ASSERT_NE(s, nullptr);
+
+    cm.addStadiumToClub(s, club);
+    EXPECT_EQ(cm.getClubStadiumsCount(club), 1);
+    EXPECT_EQ(s->ownedBy, club);
+
+    // remove only wrapper
+    bool removed = StadiumManager::deleteWrappedStadium(list, s);
+    EXPECT_TRUE(removed);
+
+    // club should still reference the stadium
+    EXPECT_EQ(cm.getClubStadiumsCount(club), 1);
+    EXPECT_EQ(s->ownedBy, club);
 
     sm.deleteAllWrappedStadiums(list);
 }

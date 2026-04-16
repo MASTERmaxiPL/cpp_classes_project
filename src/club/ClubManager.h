@@ -50,6 +50,9 @@ public:
     static void addPlayerToClub(Player* player, Club* club);
     static void addStaffToClub(Staff* staff, Club* club);
 
+    static bool removeStadiumFromClub(Stadium* stadium, Club* club);
+    static bool removePersonFromClub(Person* person, Club* club);
+
     static int getClubStadiumsCount(const Club* club);
     static int getClubPlayersCount(const Club* club);
     static int getClubStaffCount(const Club* club);
