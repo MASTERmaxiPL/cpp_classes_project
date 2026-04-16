@@ -21,6 +21,10 @@ public:
     void player(const char* name, const char* surname, int age, Country nationality, Position position);
     void staff(const char* name, const char* surname, int age, Country nationality, Role role);
 
+    static void updatePerson(Person* person, const char* name, const char* surname, int age, Country nationality);
+    static void updatePlayer(Player* player, const char* name, const char* surname, int age, Country nationality, Position position);
+    static void updateStaff(Staff* staff, const char* name, const char* surname, int age, Country nationality, Role role);
+
     PersonListNode* getAllPeopleWrapped() const;
 
     static Person* findPersonById(uint32_t id, const PersonListNode* head);

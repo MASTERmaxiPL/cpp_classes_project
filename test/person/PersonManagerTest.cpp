@@ -64,6 +64,36 @@ TEST_F(PersonManagerTest, AddPStaffToExistingList)
     EXPECT_EQ(dynamic_cast<Staff*>(s1)->role, COACH);
 }
 
+TEST_F(PersonManagerTest, EditPlayer)
+{
+    PersonListNode* list = pm.getAllPeopleWrapped();
+    Person* p1 = pm.findPersonById(1, list);
+    EXPECT_NE(p1, nullptr);
+
+    pm.updatePlayer(dynamic_cast<Player*>(p1), "Lionel", "Messi", 36, ARGENTINA, FORWARD);
+
+    EXPECT_EQ(p1->data.name, string("Lionel"));
+    EXPECT_EQ(p1->data.surname, string("Messi"));
+    EXPECT_EQ(p1->data.age, 36);
+    EXPECT_EQ(p1->data.nationality, ARGENTINA);
+    EXPECT_EQ(dynamic_cast<Player*>(p1)->position, FORWARD);
+}
+
+TEST_F(PersonManagerTest, EditStaff)
+{
+    PersonListNode* list = pm.getAllPeopleWrapped();
+    Person* s1 = pm.findPersonById(4, list);
+    EXPECT_NE(s1, nullptr);
+
+    pm.updateStaff(dynamic_cast<Staff*>(s1), "Lionel", "Messi", 56, ARGENTINA, COACH);
+
+    EXPECT_EQ(s1->data.name, string("Lionel"));
+    EXPECT_EQ(s1->data.surname, string("Messi"));
+    EXPECT_EQ(s1->data.age, 56);
+    EXPECT_EQ(s1->data.nationality, ARGENTINA);
+    EXPECT_EQ(dynamic_cast<Staff*>(s1)->role, COACH);
+}
+
 TEST(PersonManagerGetters, GetAllPeopleWrappedFromEmptyList)
 {
     PersonManager pm;

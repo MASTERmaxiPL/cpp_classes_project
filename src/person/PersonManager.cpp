@@ -17,6 +17,12 @@ PersonManager::~PersonManager()
 
 void PersonManager::player(const char* name, const char* surname, const int age, const Country nationality, const Position position)
 {
+    if (!name || !surname)
+    {
+        cout << "Invalid input: name and surname cannot be null." << endl;
+        return;
+    }
+
     auto* newPlayer = new Player;
 
     newPlayer->id = idGen.generateId();
@@ -38,6 +44,12 @@ void PersonManager::player(const char* name, const char* surname, const int age,
 
 void PersonManager::staff(const char* name, const char* surname, const int age, const Country nationality, const Role role)
 {
+    if (!name || !surname)
+    {
+        cout << "Invalid input: name and surname cannot be null." << endl;
+        return;
+    }
+
     auto* newStaff = new Staff;
 
     newStaff->id = idGen.generateId();
@@ -55,6 +67,49 @@ void PersonManager::staff(const char* name, const char* surname, const int age, 
     Person* curr = head;
     head = newStaff;
     head->next = curr;
+}
+
+void PersonManager::updatePerson(Person* person, const char* name, const char* surname, const int age, const Country nationality)
+{
+    if (!person)
+        return;
+
+    if (name)
+    {
+        delete[] person->data.name;
+        person->data.name = new char[strlen(name) + 1];
+        strcpy(person->data.name, name);
+    }
+    if (surname)
+    {
+        delete[] person->data.surname;
+        person->data.surname = new char[strlen(surname) + 1];
+        strcpy(person->data.surname, surname);
+    }
+    person->data.age = age;
+    person->data.nationality = nationality;
+}
+
+void PersonManager::updatePlayer(Player* player, const char* name, const char* surname, const int age, const Country nationality, const Position position)
+{
+    if (!player)
+        return;
+
+    if (position)
+        player->position = position;
+
+    updatePerson(player, name, surname, age, nationality);
+}
+
+void PersonManager::updateStaff(Staff* staff, const char* name, const char* surname, const int age, const Country nationality, const Role role)
+{
+    if (!staff)
+        return;
+
+    if (role)
+        staff->role = role;
+
+    updatePerson(staff, name, surname, age, nationality);
 }
 
 // --- GETTERS ---
