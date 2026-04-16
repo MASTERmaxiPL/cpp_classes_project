@@ -116,7 +116,7 @@ ClubListNode* ClubManager::getAllClubsWrapped() const
     return result;
 }
 
-// setter/getter dla matchManager
+// --- SETTERS ---
 void ClubManager::setMatchManager(MatchManager* mgr)
 {
     this->matchManager = mgr;
