@@ -237,6 +237,12 @@ bool StadiumManager::deleteStadium(Stadium* stadium)
         {
             ClubManager::removeStadiumFromClub(temp, temp->ownedBy);
         }
+
+        if (this->matchManager)
+        {
+            this->matchManager->removeStadiumFromMatchData(stadium);
+        }
+
         clearStadiumMemory(temp);
         return true;
     }
@@ -251,6 +257,11 @@ bool StadiumManager::deleteStadium(Stadium* stadium)
         if (stadium->ownedBy)
         {
             ClubManager::removeStadiumFromClub(stadium, stadium->ownedBy);
+        }
+
+        if (this->matchManager)
+        {
+            this->matchManager->removeStadiumFromMatchData(stadium);
         }
         clearStadiumMemory(stadium);
         return true;
