@@ -2,9 +2,12 @@
 #define FOOTBALL_MANAGEMENT_SYSTEM_CLUB_H
 # pragma once
 
+#include <vector>
+
 #include "../utils/Country.h"
-#include "../person/Staff.h"
+#include "../person/staff/Staff.h"
 #include "../stadium/Stadium.h"
+#include "person/player/Player.h"
 
 using namespace std;
 
@@ -14,20 +17,14 @@ struct ClubData {
     char* city{};
     int founded_year{};
 
-    StadiumListNode* stadium{nullptr};
-    PersonListNode* playersHead{nullptr};
-    PersonListNode* staffHead{nullptr};
+    vector<Stadium*> stadiums;
+    vector<Player*> players;
+    vector<Staff*> staff;
 };
 
 struct Club {
     ClubData data;
     Club *next{nullptr};
 };
-
-struct ClubListNode {
-    Club* club{};
-    ClubListNode* next{nullptr};
-};
-
 
 #endif

@@ -2,6 +2,9 @@
 #define FOOTBALL_MANAGEMENT_SYSTEM_MATCH_MANAGER_H
 #pragma once
 
+#include <functional>
+#include <vector>
+
 #include "Match.h"
 #include "../utils/IdGenerator.h"
 
@@ -27,29 +30,24 @@ public:
 
     static tm* createDate(int day, int month, int year) ;
 
-    MatchListNode* getAllMatchesWrapped() const;
+    vector<Match*> getAllMatchesCollection() const;
 
-    static Match* findMatchById(uint32_t id, const MatchListNode* head) ;
-
-    static MatchListNode* findMatchesByDate(const tm& date, int day_range, int month_range, int year_range, MatchListNode* head);
-    static MatchListNode* findMatchesByClub(Club* club, MatchListNode* head);
-    static MatchListNode* findMatchesByClubs(Club* club1, Club* club2, MatchListNode* head);
-    static MatchListNode* findMatchesByStadium(Stadium* stadium, MatchListNode* head);
-    static MatchListNode* findUnplayedMatches(MatchListNode* head);
+    static Match* findMatchById(uint32_t id, const vector<Match*>& matches) ;
+    static vector<Match*> filterMatches(const vector<Match*>& matches, const function<bool(Match*)>& predicate);
+    static vector<Match*> findMatchesByDate(const tm& date, int day_range, int month_range, int year_range, const vector<Match*>& matches);
+    static vector<Match*> findMatchesByClub(Club* club, const vector<Match*>& matches);
+    static vector<Match*> findMatchesByClubs(Club* club1, Club* club2, const vector<Match*>& matches);
+    static vector<Match*> findMatchesByStadium(Stadium* stadium, const vector<Match*>& matches);
+    static vector<Match*> findUnplayedMatches(const vector<Match*>& matches);
 
     static void clearSquadMemory(MatchSquadEntry*& squadHead);
 
     bool deleteMatch(Match* match);
-    static bool deleteWrappedMatch(MatchListNode*& head, uint32_t matchId);
 
     void deleteAllMatches();
-    static void deleteAllWrappedMatches(MatchListNode*& head);
 
     static void displayMatch(const Match* match);
     void displayMatchesList() const;
-
-    static void displayWrappedMatch(const MatchListNode* wrapped_match);
-    static void displayWrappedMatchesList(MatchListNode* head);
 
     void removeClubFromMatchData(const Club* club) const;
     void removeStadiumFromMatchData(const Stadium* stadium) const;

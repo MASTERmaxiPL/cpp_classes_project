@@ -5,7 +5,7 @@
 #include <ctime>
 #include "../stadium/Stadium.h"
 #include "../person/Person.h"
-#include "../person/Position.h"
+#include "../person/player/Position.h"
 
 using namespace std;
 
@@ -30,11 +30,6 @@ struct Match {
     uint32_t id{};
     MatchData data{};
     Match *next{nullptr};
-};
-
-struct MatchListNode {
-    Match* match;
-    MatchListNode* next;
 };
 
 #endif

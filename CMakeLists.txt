@@ -18,6 +18,8 @@ set(DOMAIN_SOURCES
         src/match/MatchManager.cpp
         src/club/ClubManager.cpp
         src/person/PersonManager.cpp
+        src/person/player/PlayerManager.cpp
+        src/person/staff/StaffManager.cpp
         src/utils/IdGenerator.cpp
 )
 
@@ -32,7 +34,23 @@ include(GoogleTest)
 
 file(GLOB_RECURSE ALL_TEST_FILES "${CMAKE_SOURCE_DIR}/test/*/*Test.cpp")
 foreach(test_src IN LISTS ALL_TEST_FILES)
-    get_filename_component(test_name ${test_src} NAME_WE) # np. ClubManagerTest
+    get_filename_component(test_name ${test_src} NAME_WE)
+    add_executable(${test_name} ${test_src})
+    target_link_libraries(${test_name} PRIVATE domain GTest::gtest_main)
+    gtest_discover_tests(${test_name})
+endforeach()
+
+file(GLOB_RECURSE ALL_TEST_FILES "${CMAKE_SOURCE_DIR}/test/player/*/*Test.cpp")
+foreach(test_src IN LISTS ALL_TEST_FILES)
+    get_filename_component(test_name ${test_src} NAME_WE)
+    add_executable(${test_name} ${test_src})
+    target_link_libraries(${test_name} PRIVATE domain GTest::gtest_main)
+    gtest_discover_tests(${test_name})
+endforeach()
+
+file(GLOB_RECURSE ALL_TEST_FILES "${CMAKE_SOURCE_DIR}/test/staff/*/*Test.cpp")
+foreach(test_src IN LISTS ALL_TEST_FILES)
+    get_filename_component(test_name ${test_src} NAME_WE)
     add_executable(${test_name} ${test_src})
     target_link_libraries(${test_name} PRIVATE domain GTest::gtest_main)
     gtest_discover_tests(${test_name})

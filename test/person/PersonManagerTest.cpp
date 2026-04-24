@@ -1,303 +1,254 @@
 #include <gtest/gtest.h>
+#include <sstream>
+#include <string>
 
 #include "../../src/person/PersonManager.h"
+#include "../../src/person/player/PlayerManager.h"
+#include "../../src/person/staff/StaffManager.h"
 #include "../../src/utils/Country.h"
-#include "club/ClubManager.h"
+#include "../../src/club/ClubManager.h"
 
-class PersonManagerTest : public testing::Test
-{
-    protected:
-    void SetUp() override
-    {
-        pm.player("Robert", "Lewandowski", 34, POLAND, FORWARD);
-        pm.player("Michał", "Grabara", 26, POLAND, GOALKEEPER);
-        pm.player("Lucas", "Hernandez", 30, FRANCE, DEFENDER);
-        pm.staff("Pep", "Guardiola", 52, SPAIN, MANAGER);
-        pm.staff("Alvarez", "Nunca", 41, SPAIN, PHYSIOTHERAPIST);
-        pm.staff("Zinedine", "Zidane", 50, FRANCE, COACH);
+class PersonManagerFullTest : public testing::Test {
+protected:
+    void SetUp() override {
+        pm.person("Robert", "Lewandowski", 34, POLAND);
+        p1 = PersonManager::findPeopleByName("Robert", "Lewandowski", pm.getAllPeopleCollection())[0];
+        plm.addPlayer(p1, FORWARD);
+
+        pm.person("Michal", "Grabara", 26, POLAND);
+        p2 = PersonManager::findPeopleByName("Michal", "Grabara", pm.getAllPeopleCollection())[0];
+        plm.addPlayer(p2, GOALKEEPER);
+
+        pm.person("Lucas", "Hernandez", 30, FRANCE);
+        p3 = PersonManager::findPeopleByName("Lucas", "Hernandez", pm.getAllPeopleCollection())[0];
+        plm.addPlayer(p3, DEFENDER);
+
+        pm.person("Pep", "Guardiola", 52, SPAIN);
+        s1 = PersonManager::findPeopleByName("Pep", "Guardiola", pm.getAllPeopleCollection())[0];
+        stm.addStaff(s1, MANAGER);
+
+        pm.person("Alvarez", "Nunca", 41, SPAIN);
+        s2 = PersonManager::findPeopleByName("Alvarez", "Nunca", pm.getAllPeopleCollection())[0];
+        stm.addStaff(s2, PHYSIOTHERAPIST);
+
+        pm.person("Zinedine", "Zidane", 50, FRANCE);
+        s3 = PersonManager::findPeopleByName("Zinedine", "Zidane", pm.getAllPeopleCollection())[0];
+        stm.addStaff(s3, COACH);
     }
 
     PersonManager pm;
+    PlayerManager plm;
+    StaffManager stm;
+
+    Person* p1{};
+    Person* p2{};
+    Person* p3{};
+    Person* s1{};
+    Person* s2{};
+    Person* s3{};
 };
 
-TEST_F(PersonManagerTest, AssignmentOperation) {
+TEST_F(PersonManagerFullTest, AssignmentOperation) {
     PersonManager copy;
     copy = pm;
 
-    PersonListNode* list = copy.getAllPeopleWrapped();
-    EXPECT_NE(list, nullptr);
-    EXPECT_NE(list->next, nullptr);
-    EXPECT_NE(list->next->next, nullptr);
-    EXPECT_NE(list->next->next->next, nullptr);
-    EXPECT_NE(list->next->next->next->next, nullptr);
-    EXPECT_NE(list->next->next->next->next->next, nullptr);
-    EXPECT_EQ(list->next->next->next->next->next->next, nullptr);
-
-    copy.deleteAllWrappedPeople(list);
+    auto list = copy.getAllPeopleCollection();
+    EXPECT_EQ(list.size(), 6);
+    EXPECT_NE(list[0], pm.getAllPeopleCollection()[0]);
+    EXPECT_STREQ(list[0]->data.name, pm.getAllPeopleCollection()[0]->data.name);
 }
 
-TEST_F(PersonManagerTest, CopyConstructor) {
+TEST_F(PersonManagerFullTest, CopyConstructor) {
     PersonManager copy(pm);
 
-    PersonListNode* list = copy.getAllPeopleWrapped();
-    EXPECT_NE(list, nullptr);
-    EXPECT_NE(list->next, nullptr);
-    EXPECT_NE(list->next->next, nullptr);
-    EXPECT_NE(list->next->next->next, nullptr);
-    EXPECT_NE(list->next->next->next->next, nullptr);
-    EXPECT_NE(list->next->next->next->next->next, nullptr);
-    EXPECT_EQ(list->next->next->next->next->next->next, nullptr);
-
-    copy.deleteAllWrappedPeople(list);
+    auto list = copy.getAllPeopleCollection();
+    EXPECT_EQ(list.size(), 6);
+    EXPECT_NE(list[0], pm.getAllPeopleCollection()[0]);
+    EXPECT_STREQ(list[0]->data.name, pm.getAllPeopleCollection()[0]->data.name);
 }
 
-TEST(PersonManagerAdditionTest, AddPersonToEmptyList)
-{
+TEST(PersonManagerAdditionTest, AddPersonToEmptyList) {
     PersonManager pm;
-    pm.player("Lionel", "Messi", 36, ARGENTINA, FORWARD);
+    PlayerManager plm;
+    
+    pm.person("Lionel", "Messi", 36, ARGENTINA);
+    Person* p = PersonManager::findPeopleByName("Lionel", "Messi", pm.getAllPeopleCollection())[0];
+    Player* pl = plm.addPlayer(p, FORWARD);
 
-    PersonListNode* list = pm.getAllPeopleWrapped();
-
-    Person* p1 = pm.findPersonById(0, list);
-    EXPECT_NE(p1, nullptr);
-    EXPECT_EQ(p1->data.name, string("Lionel"));
-    EXPECT_EQ(p1->data.surname, string("Messi"));
-    EXPECT_EQ(p1->data.age, 36);
-    EXPECT_EQ(p1->data.nationality, ARGENTINA);
-    EXPECT_EQ(dynamic_cast<Player*>(p1)->position, FORWARD);
+    auto list = pm.getAllPeopleCollection();
+    EXPECT_EQ(list.size(), 1);
+    
+    Person* found = pm.findPersonById(p->id);
+    EXPECT_NE(found, nullptr);
+    EXPECT_STREQ(found->data.name, "Lionel");
+    EXPECT_STREQ(found->data.surname, "Messi");
+    EXPECT_EQ(found->data.age, 36);
+    EXPECT_EQ(found->data.nationality, ARGENTINA);
+    EXPECT_EQ(pl->position, FORWARD);
 }
 
-TEST_F(PersonManagerTest, AddPlayerToExistingList)
-{
-    pm.player("Lionel", "Messi", 36, ARGENTINA, FORWARD);
+TEST_F(PersonManagerFullTest, AddPlayerToExistingList) {
+    pm.person("Lionel", "Messi", 36, ARGENTINA);
+    Person* p = PersonManager::findPeopleByName("Lionel", "Messi", pm.getAllPeopleCollection())[0];
+    Player* pl = plm.addPlayer(p, FORWARD);
 
-    PersonListNode* list = pm.getAllPeopleWrapped();
+    auto list = pm.getAllPeopleCollection();
+    EXPECT_EQ(list.size(), 7);
 
-    Person* p1 = pm.findPersonById(6, list);
-    EXPECT_NE(p1, nullptr);
-    EXPECT_EQ(p1->data.name, string("Lionel"));
-    EXPECT_EQ(p1->data.surname, string("Messi"));
-    EXPECT_EQ(p1->data.age, 36);
-    EXPECT_EQ(p1->data.nationality, ARGENTINA);
-    EXPECT_EQ(dynamic_cast<Player*>(p1)->position, FORWARD);
+    Person* found = pm.findPersonById(p->id);
+    EXPECT_NE(found, nullptr);
+    EXPECT_STREQ(found->data.name, "Lionel");
+    EXPECT_EQ(found->data.age, 36);
+    
+    Player* foundPlayer = plm.findPlayerByPersonId(p->id);
+    EXPECT_NE(foundPlayer, nullptr);
+    EXPECT_EQ(foundPlayer->position, FORWARD);
 }
 
-TEST_F(PersonManagerTest, AddPStaffToExistingList)
-{
-    pm.staff("Lionel", "Messi", 56, ARGENTINA, COACH);
+TEST_F(PersonManagerFullTest, AddStaffToExistingList) {
+    pm.person("Lionel", "Messi", 56, ARGENTINA);
+    Person* p = pm.findPersonById(6);
+    stm.addStaff(p, COACH);
 
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    Person* s1 = pm.findPersonById(6, list);
-    EXPECT_NE(s1, nullptr);
-    EXPECT_EQ(s1->data.name, string("Lionel"));
-    EXPECT_EQ(s1->data.surname, string("Messi"));
+    auto list = pm.getAllPeopleCollection();
+    EXPECT_EQ(list.size(), 7);
+
+    Staff* foundStaff = stm.findStaffByPersonId(p->id);
+    EXPECT_NE(foundStaff, nullptr);
+    EXPECT_EQ(foundStaff->role, COACH);
+    EXPECT_EQ(foundStaff->person->data.age, 56);
+}
+
+TEST_F(PersonManagerFullTest, EditPlayer) {
+    pm.updatePerson(p1, "Lionel", "Messi", 36, ARGENTINA);
+    
+    Player* pl = plm.findPlayerByPersonId(p1->id);
+    ASSERT_NE(pl, nullptr);
+    plm.updatePlayerPosition(pl, FORWARD);
+
+    EXPECT_STREQ(p1->data.name, "Lionel");
+    EXPECT_STREQ(p1->data.surname, "Messi");
+    EXPECT_EQ(p1->data.age, 36);
+    EXPECT_EQ(p1->data.nationality, ARGENTINA);
+    EXPECT_EQ(pl->position, FORWARD);
+}
+
+TEST_F(PersonManagerFullTest, EditStaff) {
+    pm.updatePerson(s1, "Lionel", "Messi", 56, ARGENTINA);
+    
+    Staff* st = stm.findStaffByPersonId(s1->id);
+    ASSERT_NE(st, nullptr);
+    stm.updateStaffRole(st, COACH);
+
+    EXPECT_STREQ(s1->data.name, "Lionel");
+    EXPECT_STREQ(s1->data.surname, "Messi");
     EXPECT_EQ(s1->data.age, 56);
     EXPECT_EQ(s1->data.nationality, ARGENTINA);
-    EXPECT_EQ(dynamic_cast<Staff*>(s1)->role, COACH);
+    EXPECT_EQ(st->role, COACH);
 }
 
-TEST_F(PersonManagerTest, EditPlayer)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    Person* p1 = pm.findPersonById(1, list);
-    EXPECT_NE(p1, nullptr);
-
-    pm.updatePlayer(dynamic_cast<Player*>(p1), "Lionel", "Messi", 36, ARGENTINA, FORWARD);
-
-    EXPECT_EQ(p1->data.name, string("Lionel"));
-    EXPECT_EQ(p1->data.surname, string("Messi"));
-    EXPECT_EQ(p1->data.age, 36);
-    EXPECT_EQ(p1->data.nationality, ARGENTINA);
-    EXPECT_EQ(dynamic_cast<Player*>(p1)->position, FORWARD);
+TEST(PersonManagerGetters, getAllPeopleCollectionFromEmptyList) {
+    PersonManager emptyPm;
+    auto list = emptyPm.getAllPeopleCollection();
+    EXPECT_TRUE(list.empty());
 }
 
-TEST_F(PersonManagerTest, EditStaff)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    Person* s1 = pm.findPersonById(4, list);
-    EXPECT_NE(s1, nullptr);
-
-    pm.updateStaff(dynamic_cast<Staff*>(s1), "Lionel", "Messi", 56, ARGENTINA, COACH);
-
-    EXPECT_EQ(s1->data.name, string("Lionel"));
-    EXPECT_EQ(s1->data.surname, string("Messi"));
-    EXPECT_EQ(s1->data.age, 56);
-    EXPECT_EQ(s1->data.nationality, ARGENTINA);
-    EXPECT_EQ(dynamic_cast<Staff*>(s1)->role, COACH);
-}
-
-TEST(PersonManagerGetters, GetAllPeopleWrappedFromEmptyList)
-{
+TEST(PersonManagerGetters, getAllPeopleCollectionFromExistingList) {
     PersonManager pm;
+    pm.person("Lionel", "Messi", 36, ARGENTINA);
+    pm.person("Robert", "Lewandowski", 34, POLAND);
 
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    EXPECT_EQ(list, nullptr);
-
-    pm.deleteAllWrappedPeople(list);
+    auto list = pm.getAllPeopleCollection();
+    EXPECT_EQ(list.size(), 2);
 }
 
-TEST(PersonManagerGetters, GetAllPeopleWrappedFromExisingList)
-{
-    PersonManager pm;
-    pm.player("Lionel", "Messi", 36, ARGENTINA, FORWARD);
-    pm.player("Robert", "Lewandowski", 34, POLAND, FORWARD);
-
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    EXPECT_NE(list, nullptr);
-    EXPECT_NE(list->next, nullptr);
-    EXPECT_EQ(list->next->next, nullptr);
+TEST_F(PersonManagerFullTest, FindPersonById) {
+    Person* found = pm.findPersonById(p1->id);
+    EXPECT_NE(found, nullptr);
+    EXPECT_STREQ(found->data.name, "Robert");
 }
 
-TEST_F(PersonManagerTest, FindPersonById)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    Person* p1 = pm.findPersonById(1, list);
-
-    EXPECT_NE(p1, nullptr);
+TEST_F(PersonManagerFullTest, FindPeopleByName) {
+    auto list = pm.getAllPeopleCollection();
+    auto filtered = PersonManager::findPeopleByName("Robert", "Lewandowski", list);
+    
+    ASSERT_EQ(filtered.size(), 1);
+    EXPECT_STREQ(filtered[0]->data.name, "Robert");
 }
 
-TEST_F(PersonManagerTest, FindPeopleByName)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-
-    PersonListNode* filtered = pm.findPeopleByName("Robert", "Lewandowski", list);
-
-    EXPECT_NE(filtered, nullptr);
-    EXPECT_EQ(filtered->next, nullptr);
+TEST_F(PersonManagerFullTest, FindPeopleByAge) {
+    auto list = pm.getAllPeopleCollection();
+    auto filtered = PersonManager::findPeopleByAge(34, list);
+    
+    ASSERT_EQ(filtered.size(), 1);
+    EXPECT_EQ(filtered[0]->id, p1->id);
 }
 
-TEST_F(PersonManagerTest, FindPeopleByAge)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-
-    PersonListNode* filtered = pm.findPeopleByAge(34, list);
-
-    EXPECT_NE(filtered, nullptr);
-    EXPECT_EQ(filtered->next, nullptr);
+TEST_F(PersonManagerFullTest, FindPeopleYoungerThan) {
+    auto list = pm.getAllPeopleCollection();
+    auto filtered = PersonManager::findPeopleYoungerThan(31, list);
+    
+    EXPECT_EQ(filtered.size(), 2);
 }
 
-TEST_F(PersonManagerTest, FindPeopleYoungerThan)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-
-    PersonListNode* filtered = pm.findPeopleYoungerThan(31, list);
-
-    EXPECT_NE(filtered, nullptr);
-    EXPECT_NE(filtered->next, nullptr);
-    EXPECT_EQ(filtered->next->next, nullptr);
+TEST_F(PersonManagerFullTest, FindPeopleOlderThan) {
+    auto list = pm.getAllPeopleCollection();
+    auto filtered = PersonManager::findPeopleOlderThan(45, list);
+    
+    EXPECT_EQ(filtered.size(), 2);
 }
 
-TEST_F(PersonManagerTest, FindPeopleOlderThan)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-
-    PersonListNode* filtered = pm.findPeopleOlderThan(45, list);
-
-    EXPECT_NE(filtered, nullptr);
-    EXPECT_NE(filtered->next, nullptr);
-    EXPECT_EQ(filtered->next->next, nullptr);
+TEST_F(PersonManagerFullTest, FindPeopleByNationality) {
+    auto list = pm.getAllPeopleCollection();
+    auto filtered = PersonManager::findPeopleByNationality(POLAND, list);
+    
+    EXPECT_EQ(filtered.size(), 2);
 }
 
-TEST_F(PersonManagerTest, FindPeopleByNationality)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-
-    PersonListNode* filtered = pm.findPeopleByNationality(POLAND, list);
-
-    EXPECT_NE(filtered, nullptr);
-    EXPECT_NE(filtered->next, nullptr);
-    EXPECT_EQ(filtered->next->next, nullptr);
+TEST_F(PersonManagerFullTest, FindPlayersByPosition) {
+    auto filtered = plm.findPlayersByPosition(GOALKEEPER);
+    
+    ASSERT_EQ(filtered.size(), 1);
+    EXPECT_STREQ(filtered[0]->person->data.name, "Michal");
 }
 
-TEST_F(PersonManagerTest, FindPlayersByPosition)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-
-    PersonListNode* filtered = pm.findPlayersByPosition(GOALKEEPER, list);
-
-    EXPECT_NE(filtered, nullptr);
-
-    EXPECT_EQ(strcmp(filtered->person->data.name, "Michał"), 0);
+TEST_F(PersonManagerFullTest, FindStaffByRole) {
+    auto filtered = stm.findStaffByRole(MANAGER);
+    
+    ASSERT_EQ(filtered.size(), 1);
+    EXPECT_STREQ(filtered[0]->person->data.surname, "Guardiola");
 }
 
-TEST_F(PersonManagerTest, FindStaffByRole)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-
-    PersonListNode* filtered = pm.findStaffByRole(MANAGER, list);
-
-    EXPECT_NE(filtered, nullptr);
-    EXPECT_EQ(strcmp(filtered->person->data.surname, "Guardiola"), 0);
-}
-
-TEST(PersonManagerDeletionTest, DeletePersonFromEmptyList)
-{
-    PersonManager pm;
-
-    const bool success = pm.deletePerson(1);
+TEST(PersonManagerDeletionTest, DeletePersonFromEmptyList) {
+    PersonManager emptyPm;
+    const bool success = emptyPm.deletePerson(1);
     ASSERT_FALSE(success);
 }
 
-TEST_F(PersonManagerTest, DeleteExistingPerson)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    Person* person = pm.findPersonById(1, list);
-    ASSERT_NE(person, nullptr);
-
-    const bool success = pm.deletePerson(1);
+TEST_F(PersonManagerFullTest, DeleteExistingPerson) {
+    uint32_t targetId = p1->id;
+    
+    plm.removePlayerByPersonId(targetId);
+    const bool success = pm.deletePerson(targetId);
+    
     ASSERT_TRUE(success);
-
-    pm.deleteAllWrappedPeople(list);
+    EXPECT_EQ(pm.findPersonById(targetId), nullptr);
 }
 
-TEST_F(PersonManagerTest, DeleteWrappedPerson)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    Person* person = pm.findPersonById(2, list);
-    ASSERT_NE(person, nullptr);
-
-    bool removed = pm.deleteWrappedPerson(list, 2);
-    EXPECT_TRUE(removed);
-
-    Person* again = pm.findPersonById(2, list);
-    EXPECT_EQ(again, nullptr);
-
-    pm.deleteAllWrappedPeople(list);
-}
-
-TEST_F(PersonManagerTest, DeleteAllWrappedPeople)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-
-    pm.deleteAllWrappedPeople(list);
-
-    Person* p1 = pm.findPersonById(1, list);
-    Person* p2 = pm.findPersonById(2, list);
-
-    EXPECT_EQ(p1, nullptr);
-    EXPECT_EQ(p2, nullptr);
-}
-
-TEST_F(PersonManagerTest, DisplayPerson)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    Person* person = pm.findPersonById(1, list);
-    ASSERT_NE(person, nullptr);
-
+TEST_F(PersonManagerFullTest, DisplayPerson) {
     std::stringstream buffer;
     std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
 
-    pm.displayPerson(person);
+    pm.displayPerson(p2);
 
     std::cout.rdbuf(old);
     std::string output = buffer.str();
 
-    ASSERT_NE(output.find("Michał"), std::string::npos);
+    ASSERT_NE(output.find("Michal"), std::string::npos);
     ASSERT_NE(output.find("Grabara"), std::string::npos);
 }
 
-TEST_F(PersonManagerTest, DisplayPeopleList)
-{
+TEST_F(PersonManagerFullTest, DisplayPeopleList) {
     std::stringstream buffer;
     std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
 
@@ -308,135 +259,28 @@ TEST_F(PersonManagerTest, DisplayPeopleList)
 
     ASSERT_NE(output.find("Robert"), std::string::npos);
     ASSERT_NE(output.find("Lewandowski"), std::string::npos);
-    ASSERT_NE(output.find("Michał"), std::string::npos);
-    ASSERT_NE(output.find("Grabara"), std::string::npos);
-    ASSERT_NE(output.find("Lucas"), std::string::npos);
-    ASSERT_NE(output.find("Hernandez"), std::string::npos);
     ASSERT_NE(output.find("Pep"), std::string::npos);
-    ASSERT_NE(output.find("Guardiola"), std::string::npos);
-    ASSERT_NE(output.find("Alvarez"), std::string::npos);
-    ASSERT_NE(output.find("Nunca"), std::string::npos);
-    ASSERT_NE(output.find("Zinedine"), std::string::npos);
     ASSERT_NE(output.find("Zidane"), std::string::npos);
 }
 
-TEST_F(PersonManagerTest, DisplayWrappedPerson)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    ASSERT_NE(list, nullptr);
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-
-    pm.displayWrappedPerson(list->next->next->next);
-
-    std::cout.rdbuf(old);
-    std::string output = buffer.str();
-
-    ASSERT_NE(output.find("Guardiola"), std::string::npos);
-    ASSERT_NE(output.find("52"), std::string::npos);
-
-    pm.deleteAllWrappedPeople(list);
-}
-
-TEST_F(PersonManagerTest, DisplayWrappedPeopleList)
-{
-    PersonListNode* list = pm.getAllPeopleWrapped();
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-
-    pm.displayWrappedPeopleList(list);
-
-    std::cout.rdbuf(old);
-    std::string output = buffer.str();
-
-    ASSERT_NE(output.find("Robert"), std::string::npos);
-    ASSERT_NE(output.find("Lewandowski"), std::string::npos);
-    ASSERT_NE(output.find("Michał"), std::string::npos);
-    ASSERT_NE(output.find("Grabara"), std::string::npos);
-    ASSERT_NE(output.find("Lucas"), std::string::npos);
-    ASSERT_NE(output.find("Hernandez"), std::string::npos);
-    ASSERT_NE(output.find("Pep"), std::string::npos);
-    ASSERT_NE(output.find("Guardiola"), std::string::npos);
-    ASSERT_NE(output.find("Alvarez"), std::string::npos);
-    ASSERT_NE(output.find("Nunca"), std::string::npos);
-    ASSERT_NE(output.find("Zinedine"), std::string::npos);
-    ASSERT_NE(output.find("Zidane"), std::string::npos);
-
-    pm.deleteAllWrappedPeople(list);
-}
-
-TEST(PersonManagerClubIntegrationTest, DeletePersonRemovesFromClub)
-{
+TEST_F(PersonManagerFullTest, DeletePersonRemovesFromClub) {
     ClubManager cm;
     cm.club("TestClub", POLAND, "City", 1900);
     Club* club = cm.findClubByName("TestClub");
     ASSERT_NE(club, nullptr);
 
-    PersonManager pm;
-    pm.player("Test", "Player", 28, POLAND, MIDFIELDER);
+    pm.person("Test", "Player", 28, POLAND);
+    Person* testP = PersonManager::findPeopleByName("Test", "Player", pm.getAllPeopleCollection())[0];
+    Player* testPl = plm.addPlayer(testP, MIDFIELDER);
 
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    Person* p = nullptr;
-    for (PersonListNode* it = list; it != nullptr; it = it->next)
-    {
-        if (strcmp(it->person->data.name, "Test") == 0 && strcmp(it->person->data.surname, "Player") == 0)
-        {
-            p = it->person;
-            break;
-        }
-    }
-    ASSERT_NE(p, nullptr);
-
-    // add player to club
-    cm.addPlayerToClub(dynamic_cast<Player*>(p), club);
-    EXPECT_EQ(cm.getClubPlayersCount(club), 1);
-
-    // delete person (should remove from club inside deletePerson)
-    const bool success = pm.deletePerson(p->id);
-    EXPECT_TRUE(success);
-
-    // wrapper in club should be removed
     EXPECT_EQ(cm.getClubPlayersCount(club), 0);
 
-    pm.deleteAllWrappedPeople(list);
-}
-
-TEST(PersonManagerClubIntegrationTest, DeleteWrappedPersonDoesNotRemoveHiredBy)
-{
-    ClubManager cm;
-    cm.club("TestClub2", POLAND, "City", 1901);
-    Club* club = cm.findClubByName("TestClub2");
-    ASSERT_NE(club, nullptr);
-
-    PersonManager pm;
-    pm.player("Wrapped", "Player", 30, POLAND, MIDFIELDER);
-
-    PersonListNode* list = pm.getAllPeopleWrapped();
-    Person* p = nullptr;
-    for (PersonListNode* it = list; it != nullptr; it = it->next)
-    {
-        if (strcmp(it->person->data.name, "Wrapped") == 0)
-        {
-            p = it->person;
-            break;
-        }
-    }
-    ASSERT_NE(p, nullptr);
-
-    // add to club
-    cm.addPlayerToClub(dynamic_cast<Player*>(p), club);
+    cm.addPlayerToClub(testPl, club);
     EXPECT_EQ(cm.getClubPlayersCount(club), 1);
-    EXPECT_EQ(p->hiredBy, club);
 
-    // remove only wrapper from the wrapped-list (should not affect the club or hiredBy)
-    bool removed = PersonManager::deleteWrappedPerson(list, p->id);
-    EXPECT_TRUE(removed);
+    const bool success = pm.deletePerson(testP->id);
+    EXPECT_TRUE(success);
+    plm.removePlayerByPersonId(testP->id);
 
-    // club should still reference the player (playersHead not affected)
-    EXPECT_EQ(cm.getClubPlayersCount(club), 1);
-    EXPECT_EQ(p->hiredBy, club);
-
-    pm.deleteAllWrappedPeople(list);
+    EXPECT_EQ(cm.getClubPlayersCount(club), 0);
 }

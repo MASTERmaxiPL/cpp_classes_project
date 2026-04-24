@@ -2,8 +2,10 @@
 
 #include "../../src/club/ClubManager.h"
 #include "../../src/utils/Country.h"
-#include "person/PersonManager.h"
-#include "stadium/StadiumManager.h"
+#include "../../src/person/PersonManager.h"
+#include "../../src/person/player/PlayerManager.h"
+#include "../../src/stadium/stadiumManager.h"
+#include "person/staff/StaffManager.h"
 
 class ClubManagerTest : public testing::Test
 {
@@ -72,36 +74,22 @@ TEST_F(ClubManagerTest, EditExistingClub) {
     EXPECT_STREQ(c1->data.city, "Warszawa");
 }
 
-TEST(ClubManagerGetters, GetAllClubsWrappedFromEmptyList) {
+TEST(ClubManagerGetters, getAllClubsCollectionFromEmptyList) {
     ClubManager sm;
 
-    ClubListNode* list = sm.getAllClubsWrapped();
-    EXPECT_EQ(list, nullptr);
-
-    sm.deleteAllWrappedList(list);
+    vector<Club*> list = sm.getAllClubsCollection();
+    EXPECT_EQ(list.empty(), true);
 }
 
-TEST(ClubManagerGetters, GetAllClubsWrappedFromExistingList) {
+TEST(ClubManagerGetters, getAllClubsCollectionFromExistingList) {
     ClubManager sm;
     sm.club("Legia Warszawa", POLAND, "Warsaw", 1916);
     sm.club("Lech Poznań", POLAND, "Poznań", 1922);
 
-    ClubListNode* list = sm.getAllClubsWrapped();
-    EXPECT_NE(list, nullptr);
-    EXPECT_NE(list->next, nullptr);
-    EXPECT_EQ(list->next->next, nullptr);
-
-    sm.deleteAllWrappedList(list);
-}
-
-TEST_F(ClubManagerTest, TryToFindNotExistingClubByName)
-{
-    auto list = sm.getAllClubsWrapped();
-    Club* c1 = sm.findClubByNameInWrapper("UNKNOWN", list);
-
-    EXPECT_EQ(c1, nullptr);
-
-    sm.deleteAllWrappedList(list);
+    const vector<Club*> list = sm.getAllClubsCollection();
+    EXPECT_NE(list.empty(), true);
+    EXPECT_NE(list.front()->next, nullptr);
+    EXPECT_EQ(list.front()->next->next, nullptr);
 }
 
 TEST_F(ClubManagerTest, FindClubByName)
@@ -111,89 +99,65 @@ TEST_F(ClubManagerTest, FindClubByName)
     EXPECT_NE(c1, nullptr);
 }
 
-TEST_F(ClubManagerTest, FindWrappedClubByName)
-{
-    auto list = sm.getAllClubsWrapped();
-    Club* c1 = sm.findClubByNameInWrapper("Legia Warszawa", list);
-    EXPECT_NE(c1, nullptr);
-
-    sm.deleteAllWrappedList(list);
-}
-
 TEST_F(ClubManagerTest, FindClubsByCountry)
 {
-    auto list = sm.getAllClubsWrapped();
-    ClubListNode* c1 = sm.findClubsByCountry(POLAND, list);
+    const auto list = sm.getAllClubsCollection();
+    const vector<Club*> c1 = sm.findClubsByCountry(POLAND, list);
 
-    EXPECT_NE(c1, nullptr);
-    EXPECT_NE(c1->next, nullptr);
-
-    sm.deleteAllWrappedList(list);
+    EXPECT_NE(c1.front(), nullptr);
+    EXPECT_NE(c1.back(), nullptr);
 }
 
 TEST_F(ClubManagerTest, FindClubsByCity)
 {
     sm.club("Polonia Warszawa", POLAND, "Warsaw", 1927);
 
-    auto list = sm.getAllClubsWrapped();
+    auto list = sm.getAllClubsCollection();
 
-    ClubListNode* c1 = sm.findClubsByCity("Warsaw", list);
+    vector<Club*> c1 = sm.findClubsByCity("Warsaw", list);
 
-    EXPECT_NE(c1, nullptr);
-    EXPECT_NE(c1->next, nullptr);
-
-    sm.deleteAllWrappedList(list);
+    EXPECT_NE(c1.front(), nullptr);
 }
 
 TEST_F(ClubManagerTest, FindClubsByFoundedYear)
 {
-    auto list = sm.getAllClubsWrapped();
-    ClubListNode* c1 = sm.findClubsByFoundedYear(1916, list);
+    const auto list = sm.getAllClubsCollection();
+    vector<Club*> c1 = sm.findClubsByFoundedYear(1916, list);
 
-    EXPECT_NE(c1, nullptr);
-    EXPECT_EQ(c1->next, nullptr);
-
-    sm.deleteAllWrappedList(list);
+    EXPECT_NE(c1.front(), nullptr);
+    EXPECT_EQ(c1.front(), c1.back());
 }
 
 TEST_F(ClubManagerTest, FindClubsByNewerFoundedYear)
 {
-    auto list = sm.getAllClubsWrapped();
-    ClubListNode* c1 = sm.findClubsByNewerFoundedYear(1910, list);
+    const auto list = sm.getAllClubsCollection();
+    vector<Club*> c1 = sm.findClubsByNewerFoundedYear(1910, list);
 
-    EXPECT_NE(c1, nullptr);
-    EXPECT_NE(c1->next, nullptr);
-
-    sm.deleteAllWrappedList(list);
+    EXPECT_NE(c1.front(), nullptr);
 }
 
 TEST_F(ClubManagerTest, FindClubsByOlderFoundedYear)
 {
-    auto list = sm.getAllClubsWrapped();
-    ClubListNode* c1 = sm.findClubsByOlderFoundedYear(1910, list);
+    const auto list = sm.getAllClubsCollection();
+    vector<Club*> c1 = sm.findClubsByOlderFoundedYear(1910, list);
 
-    EXPECT_NE(c1, nullptr);
-    EXPECT_EQ(c1->next, nullptr);
-
-    sm.deleteAllWrappedList(list);
+    EXPECT_NE(c1.front(), nullptr);
+    EXPECT_EQ(c1.front(), c1.back());
 }
 
 TEST_F(ClubManagerTest, ChainFilters)
 {
-    auto list = sm.getAllClubsWrapped();
+    const auto list = sm.getAllClubsCollection();
 
-    auto poland = sm.findClubsByCountry(POLAND, list);
-    auto warsaw = sm.findClubsByCity("Warsaw", poland);
+    const auto poland = sm.findClubsByCountry(POLAND, list);
+    const auto warsaw = sm.findClubsByCity("Warsaw", poland);
 
     int count = 0;
-    for (auto* it = warsaw; it != nullptr; it = it->next)
+    for (Club* club : warsaw) {
         count++;
+    }
 
     EXPECT_EQ(count, 1);
-
-    sm.deleteAllWrappedList(list);
-    sm.deleteAllWrappedList(poland);
-    sm.deleteAllWrappedList(warsaw);
 }
 
 TEST(ClubManagerDeletionTest, DeleteClubFromEmptyList)
@@ -235,50 +199,19 @@ TEST_F(ClubManagerTest, DeleteAllClubs)
     EXPECT_EQ(c2, nullptr);
 }
 
-TEST_F(ClubManagerTest, DeleteWrappedClub)
-{
-    auto list = sm.getAllClubsWrapped();
-
-    Club* c = sm.findClubByNameInWrapper("Legia Warszawa", list);
-    ASSERT_NE(c, nullptr);
-
-    bool removed = sm.deleteWrappedClub(list, c);
-    EXPECT_TRUE(removed);
-
-    Club* again = sm.findClubByNameInWrapper("Legia Warszawa", list);
-    EXPECT_EQ(again, nullptr);
-
-    sm.deleteAllWrappedList(list);
-}
-
-TEST_F(ClubManagerTest, DeleteAllWrapperList)
-{
-    auto list = sm.getAllClubsWrapped();
-
-    sm.deleteAllWrappedList(list);
-
-    ClubListNode* c1 = sm.findClubsByCountry(POLAND, list);
-    ClubListNode* c2 = sm.findClubsByCity("Warsaw", list);
-
-    EXPECT_EQ(c1, nullptr);
-    EXPECT_EQ(c2, nullptr);
-}
-
 TEST_F(ClubManagerTest, DisplayClub)
 {
-    auto list = sm.getAllClubsWrapped();
+    auto list = sm.getAllClubsCollection();
 
     std::stringstream buffer;
     std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
 
-    sm.displayWrappedClub(list);
+    sm.displayClub(list.front());
 
     std::cout.rdbuf(old);
     std::string output = buffer.str();
 
-    ASSERT_NE(output.find(list->club->data.name), std::string::npos);
-
-    sm.deleteAllWrappedList(list);
+    ASSERT_NE(output.find(list.front()->data.name), std::string::npos);
 }
 
 TEST_F(ClubManagerTest, DisplayClubList)
@@ -299,60 +232,6 @@ TEST_F(ClubManagerTest, DisplayClubList)
     sm.deleteAllClubs();
 }
 
-TEST_F(ClubManagerTest, DisplayWrappedClub)
-{
-    auto list = sm.getAllClubsWrapped();
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-
-    sm.displayWrappedClub(list);
-
-    std::cout.rdbuf(old);
-    std::string output = buffer.str();
-
-    ASSERT_NE(output.find(list->club->data.name), std::string::npos);
-
-    sm.deleteAllWrappedList(list);
-}
-
-TEST_F(ClubManagerTest, DisplayWrappedClubListWithEmptyList)
-{
-    auto list = sm.getAllClubsWrapped();
-
-    sm.deleteAllWrappedList(list);
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-
-    sm.displayWrappedClubList(list);
-
-    std::cout.rdbuf(old);
-    std::string output = buffer.str();
-
-    ASSERT_EQ(output, "");
-}
-
-TEST_F(ClubManagerTest, DisplayWrappedClubList)
-{
-    auto list = sm.getAllClubsWrapped();
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-
-    sm.displayWrappedClubList(list);
-
-    std::cout.rdbuf(old);
-    std::string output = buffer.str();
-
-    ASSERT_NE(output.find("PSG"), std::string::npos);
-    ASSERT_NE(output.find("FC Bayern Munich"), std::string::npos);
-    ASSERT_NE(output.find("Legia Warszawa"), std::string::npos);
-    ASSERT_NE(output.find("Lech Poznań"), std::string::npos);
-
-    sm.deleteAllWrappedList(list);
-}
-
 TEST_F(ClubManagerTest, AddStadiumToClub)
 {
     Club* club = sm.findClubByName("Legia Warszawa");
@@ -371,28 +250,42 @@ TEST_F(ClubManagerTest, AddStadiumToClub)
 TEST_F(ClubManagerTest, AddPlayerToClub)
 {
     Club* club = sm.findClubByName("Legia Warszawa");
+    ASSERT_NE(club, nullptr);
 
-    Player* player = new Player;
+    PersonManager pm;
+    PlayerManager plm;
 
-    ClubManager::addPlayerToClub(player, club);
+    pm.person("Jan", "Kowalski", 25, POLAND);
+    Person* p = pm.findPersonById(0);
 
-    int count = ClubManager::getClubPlayersCount(club);
+    Player* player = plm.addPlayer(p, FORWARD);
+
+    sm.addPlayerToClub(player, club);
+
+    const int count = sm.getClubPlayersCount(club);
     EXPECT_EQ(count, 1);
-
-    delete player;
 }
 
 TEST_F(ClubManagerTest, AddStaffToClub)
 {
     Club* club = sm.findClubByName("Legia Warszawa");
-    Staff* staff = new Staff;
+    ASSERT_NE(club, nullptr);
 
-    ClubManager::addStaffToClub(staff, club);
+    PersonManager pm;
+    StaffManager stm;
 
-    int count = ClubManager::getClubStaffCount(club);
+    pm.person("Adam", "Trener", 45, POLAND);
+
+    Person* p = pm.findPersonById(0);
+    ASSERT_NE(p, nullptr);
+
+    Staff* staff = stm.addStaff(p, COACH);
+    ASSERT_NE(staff, nullptr);
+
+    sm.addStaffToClub(staff, club);
+
+    const int count = sm.getClubStaffCount(club);
     EXPECT_EQ(count, 1);
-
-    delete staff;
 }
 
 TEST_F(ClubManagerTest, GetClubStadiumsCountWithEmptyList)
@@ -443,61 +336,71 @@ TEST_F(ClubManagerTest, GetClubPlayersCountWithExistingList)
 {
     Club* club = sm.findClubByName("Legia Warszawa");
 
-    Player* player1 = new Player;
-    Player* player2 = new Player;
+    PersonManager pm;
+    PlayerManager plm;
 
-    ClubManager::addPlayerToClub(player1, club);
-    ClubManager::addPlayerToClub(player2, club);
+    pm.person("Jan", "Kowalski", 25, POLAND);
+    pm.person("Adam", "Nowak", 30, POLAND);
 
-    int count = ClubManager::getClubPlayersCount(club);
+    Player* player1 = plm.addPlayer(pm.findPersonById(0), FORWARD);
+    Player* player2 = plm.addPlayer(pm.findPersonById(1), MIDFIELDER);
+
+    sm.addPlayerToClub(player1, club);
+    sm.addPlayerToClub(player2, club);
+
+    int count = sm.getClubPlayersCount(club);
     EXPECT_EQ(count, 2);
-
-    delete player1;
-    delete player2;
 }
 
 TEST_F(ClubManagerTest, GetClubStaffCountWithExistingList)
 {
     Club* club = sm.findClubByName("Legia Warszawa");
 
-    Staff* staff1 = new Staff;
-    Staff* staff2 = new Staff;
+    PersonManager pm;
+    StaffManager stm;
 
-    ClubManager::addStaffToClub(staff1, club);
-    ClubManager::addStaffToClub(staff2, club);
+    pm.person("Adam", "Trener", 45, POLAND);
+    pm.person("Ewa", "Asystent", 35, POLAND);
 
-    int count = ClubManager::getClubStaffCount(club);
+    Staff* staff1 = stm.addStaff(pm.findPersonById(0), COACH);
+    Staff* staff2 = stm.addStaff(pm.findPersonById(1), SCOUT);
+
+    sm.addStaffToClub(staff1, club);
+    sm.addStaffToClub(staff2, club);
+
+    int count = sm.getClubStaffCount(club);
     EXPECT_EQ(count, 2);
-
-    delete staff1;
-    delete staff2;
 }
 
 TEST_F(ClubManagerTest, RemovePersonAndStadiumFromClub)
 {
+    PersonManager pm;
+    PlayerManager plm;
+    StadiumManager stm;
+
     Club* club = sm.findClubByName("Legia Warszawa");
     ASSERT_NE(club, nullptr);
 
-    PersonManager pm;
-    pm.player("CClub", "Member", 25, POLAND, FORWARD);
-    PersonListNode* plist = pm.getAllPeopleWrapped();
-    Person* p = pm.findPersonById(0, plist);
+    pm.person("CClub", "Member", 25, POLAND);
+    Person* p = pm.findPersonById(0);
     ASSERT_NE(p, nullptr);
 
-    StadiumManager stm;
+    Player* player = plm.addPlayer(p, FORWARD);
+    ASSERT_NE(player, nullptr);
+
     stm.stadium("ClubStadium", POLAND, "Warsaw", 20000);
-    StadiumListNode* slist = stm.getAllStadiumsWrapped();
-    Stadium* s = stm.findStadiumByNameInWrapper("ClubStadium", slist);
+    auto allStadiums = stm.getAllStadiumsCollection();
+    Stadium* s = stm.findStadiumByName("ClubStadium", allStadiums);
     ASSERT_NE(s, nullptr);
 
-    sm.addPlayerToClub(dynamic_cast<Player*>(p), club);
+    sm.addPlayerToClub(player, club);
     sm.addStadiumToClub(s, club);
 
     EXPECT_EQ(sm.getClubPlayersCount(club), 1);
     EXPECT_EQ(sm.getClubStadiumsCount(club), 1);
 
-    bool pr = sm.removePersonFromClub(p, club);
-    bool sr = sm.removeStadiumFromClub(s, club);
+    const bool pr = sm.removePersonFromClub(p, club);
+    const bool sr = sm.removeStadiumFromClub(s, club);
 
     EXPECT_TRUE(pr);
     EXPECT_TRUE(sr);
@@ -505,6 +408,6 @@ TEST_F(ClubManagerTest, RemovePersonAndStadiumFromClub)
     EXPECT_EQ(sm.getClubPlayersCount(club), 0);
     EXPECT_EQ(sm.getClubStadiumsCount(club), 0);
 
-    pm.deleteAllWrappedPeople(plist);
-    stm.deleteAllWrappedStadiums(slist);
+    EXPECT_EQ(p->hiredBy, nullptr);
+    EXPECT_EQ(s->ownedBy, nullptr);
 }

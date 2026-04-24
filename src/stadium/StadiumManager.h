@@ -3,6 +3,9 @@
 
 #pragma once
 
+# include <vector>
+# include <functional>
+
 #include "Stadium.h"
 #include "../match/MatchManager.h"
 
@@ -22,27 +25,22 @@ public:
     void stadium(const char* name, Country country, const char* city, int numberOfSeats);
     void stadium(const char* name, Country country, const char* city);
 
-    StadiumListNode* getAllStadiumsWrapped() const;
+    vector<Stadium*> getAllStadiumsCollection() const;
 
-    Stadium* findStadiumByName(const char* name) const;
-    static Stadium* findStadiumByNameInWrapper(const char* name, StadiumListNode* head) ;
+    static vector<Stadium*> filterStadiums(const std::vector<Stadium*>& stadiums, std::function<bool(Stadium*)> predicate);
 
-    static StadiumListNode* findStadiumsByCountry(Country country, StadiumListNode* head) ;
-    static StadiumListNode* findStadiumsByCity(const char* city, StadiumListNode* head) ;
-    static StadiumListNode* findStadiumsByMinSeats(int minSeats, StadiumListNode* head) ;
-    static StadiumListNode* findStadiumsByMaxSeats(int maxSeats, StadiumListNode* head);
+    static Stadium* findStadiumByName(const char* name, const vector<Stadium*>& stadiums);
+    static vector<Stadium*> findStadiumsByCountry(Country country, const vector<Stadium*>& stadiums);
+    static vector<Stadium*> findStadiumsByCity(const char* city, const vector<Stadium*>& stadiums);
+    static vector<Stadium*> findStadiumsByMinSeats(int minSeats, const vector<Stadium*>& stadiums);
+    static vector<Stadium*> findStadiumsByMaxSeats(int maxSeats, const vector<Stadium*>& stadiums);
 
     bool deleteStadium(Stadium* stadium);
-    static bool deleteWrappedStadium(StadiumListNode*& head, Stadium* target);
 
     void deleteAllStadiums();
-    static void deleteAllWrappedStadiums(StadiumListNode*& head);
 
     static void displayStadium(const Stadium* head);
     void displayStadiumList() const;
-
-    static void displayWrappedStadium(const StadiumListNode* wrapped_stadium);
-    static void displayWrappedStadiumList(StadiumListNode* wrapped_stadium);
 
     void setMatchManager(MatchManager* mgr);
 };

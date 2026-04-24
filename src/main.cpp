@@ -1,42 +1,64 @@
 #include <iostream>
+#include <vector>
 
 #include "match/MatchManager.h"
 #include "club/ClubManager.h"
 #include "stadium/StadiumManager.h"
 #include "person/PersonManager.h"
+#include "person/player/PlayerManager.h"
+#include "person/staff/StaffManager.h"
 
 using namespace std;
 
 int main()
 {
-    // Init of managers
     MatchManager mm;
     ClubManager cm(&mm);
     StadiumManager sm(&mm);
     PersonManager pm(&mm);
+    PlayerManager plm;
+    StaffManager stm;
 
-    // Create some clubs, stadiums and people
     sm.stadium("Stadium First", static_cast<Country>(2), "CityA", 80000);
     sm.stadium("Stadium Second", static_cast<Country>(0), "CityC", 200000);
     sm.stadium("Stadium Third", static_cast<Country>(3), "CityD", 130000);
-    Stadium* stadiumX = sm.findStadiumByName("Stadium Second");
+
+    auto allStadiums = sm.getAllStadiumsCollection();
+    Stadium* stadiumX = sm.findStadiumByName("Stadium Second", allStadiums);
 
     cm.club("Team A", static_cast<Country>(0), "CityA", 1900);
     cm.club("Team B", static_cast<Country>(2), "CityB", 1900);
     cm.club("Team C", static_cast<Country>(4), "CityC", 1938);
     cm.club("Team D", static_cast<Country>(5), "CityD", 1924);
 
-    cm.addStadiumToClub(stadiumX, cm.findClubByName("Team A"));
-    cm.displayClub(cm.findClubByName("Team A"));
+    Club* teamA = cm.findClubByName("Team A");
+    cm.addStadiumToClub(stadiumX, teamA);
+    cm.displayClub(teamA);
 
-    pm.player("John", "Doe", 25, static_cast<Country>(0), static_cast<Position>(2));
-    pm.player("Max", "Payne", 28, static_cast<Country>(2), static_cast<Position>(0));
-    pm.player("John", "Doe", 32, static_cast<Country>(0), static_cast<Position>(3));
-    pm.player("Wendy", "Hamilz", 28, static_cast<Country>(1), static_cast<Position>(1));
-    pm.staff("Ling", "Pollen", 28, static_cast<Country>(3), static_cast<Role>(0));
-    pm.staff("Max", "Wong", 28, static_cast<Country>(0), static_cast<Role>(1));
+    pm.person("John", "Doe", 25, static_cast<Country>(0));
+    pm.person("Max", "Payne", 28, static_cast<Country>(2));
+    pm.person("John", "Doe", 32, static_cast<Country>(0));
+    pm.person("Wendy", "Hamilz", 28, static_cast<Country>(1));
+    pm.person("Ling", "Pollen", 28, static_cast<Country>(3));
+    pm.person("Max", "Wong", 28, static_cast<Country>(0));
 
-    // Preparing matches
+    auto allPeople = pm.getAllPeopleCollection();
+
+    Person* p_john25 = PersonManager::findPeopleByAge(25, PersonManager::findPeopleByName("John", "Doe", allPeople))[0];
+    Person* p_max = PersonManager::findPeopleByName("Max", "Payne", allPeople)[0];
+    Person* p_john32 = PersonManager::findPeopleByAge(32, PersonManager::findPeopleByName("John", "Doe", allPeople))[0];
+    Person* p_wendy = PersonManager::findPeopleByName("Wendy", "Hamilz", allPeople)[0];
+    Person* s_ling = PersonManager::findPeopleByName("Ling", "Pollen", allPeople)[0];
+    Person* s_max = PersonManager::findPeopleByName("Max", "Wong", allPeople)[0];
+
+    plm.addPlayer(p_john25, static_cast<Position>(2));
+    plm.addPlayer(p_max, static_cast<Position>(0));
+    plm.addPlayer(p_john32, static_cast<Position>(3));
+    plm.addPlayer(p_wendy, static_cast<Position>(1));
+
+    stm.addStaff(s_ling, static_cast<Role>(0));
+    stm.addStaff(s_max, static_cast<Role>(1));
+
     Club* home_club = cm.findClubByName("Team C");
     Club* away_club = cm.findClubByName("Team B");
 
@@ -50,80 +72,68 @@ int main()
     }
     delete date1;
 
-    MatchListNode* matches = mm.getAllMatchesWrapped();
-    Match* match1 = mm.findMatchById(0, matches);
-    Match* match2 = mm.findMatchById(1, matches);
+    auto allMatches = mm.getAllMatchesCollection();
+    if (allMatches.size() >= 2) {
+        Match* match1 = allMatches[0];
+        Match* match2 = allMatches[1];
 
-    if (match1 && match2) {
-        mm.addPlayerToSquad(match1, 1, static_cast<Position>(2), true);
-        mm.addPlayerToSquad(match1, 0, static_cast<Position>(0), true);
-        mm.addPlayerToSquad(match1, 3, static_cast<Position>(1), false);
-        mm.addPlayerToSquad(match1, 2, static_cast<Position>(0), false);
+        mm.addPlayerToSquad(match1, p_john25->id, static_cast<Position>(2), true);
+        mm.addPlayerToSquad(match1, p_max->id, static_cast<Position>(0), true);
+        mm.addPlayerToSquad(match1, p_john32->id, static_cast<Position>(1), false);
+        mm.addPlayerToSquad(match1, p_wendy->id, static_cast<Position>(0), false);
 
-        mm.addPlayerToSquad(match2, 1, static_cast<Position>(2), false);
-        mm.addPlayerToSquad(match2, 0, static_cast<Position>(0), false);
-        mm.addPlayerToSquad(match2, 3, static_cast<Position>(1), true);
-        mm.addPlayerToSquad(match2, 2, static_cast<Position>(0), true);
+        mm.addPlayerToSquad(match2, p_john25->id, static_cast<Position>(2), false);
+        mm.addPlayerToSquad(match2, p_max->id, static_cast<Position>(0), false);
+        mm.addPlayerToSquad(match2, p_john32->id, static_cast<Position>(1), true);
+        mm.addPlayerToSquad(match2, p_wendy->id, static_cast<Position>(0), true);
     }
 
-
     cout << "=== Matches after creation ===" << endl;
-
     mm.displayMatchesList();
 
     // EXAMPLE 0
-    // Find people older than 26
-    PersonListNode* people = pm.findPeopleOlderThan(26, pm.getAllPeopleWrapped());
+    auto olderPeople = PersonManager::findPeopleOlderThan(26, pm.getAllPeopleCollection());
     cout << "=== People older than 26 ===" << endl;
-    pm.displayWrappedPeopleList(people);
-    pm.deleteAllWrappedPeople(people);
+    for (Person* p : olderPeople) {
+        pm.displayPerson(p);
+    }
 
     // EXAMPLE 1
-    // Updating match data ( moving match by 5 days and setting score )
-    MatchListNode* match_node = mm.findMatchesByDate(*date2, 0, 0, 0, matches);
-
+    auto matches_by_date = mm.findMatchesByDate(*date2, 0, 0, 0, mm.getAllMatchesCollection());
     delete date2;
 
-    if (match_node)
+    if (!matches_by_date.empty())
     {
-        Match *m = match_node->match;
-
-        if (m)
+        Match *m = matches_by_date[0];
+        tm* newDate = mm.createDate(m->data.date.tm_mday + 5, m->data.date.tm_mon + 1, m->data.date.tm_year + 1900);
+        if (newDate)
         {
-            tm* newDate = mm.createDate(m->data.date.tm_mday + 5, m->data.date.tm_mon + 1, m->data.date.tm_year + 1900);
-            if (newDate)
-            {
-                mm.updateMatch(m, *newDate, nullptr, nullptr, nullptr, 3, 2, nullptr, nullptr);
-                delete newDate;
-            }
+            mm.updateMatch(m, *newDate, nullptr, nullptr, nullptr, 3, 2, nullptr, nullptr);
+            delete newDate;
         }
     }
     cout << "=== Matches after update ===" << endl;
     mm.displayMatchesList();
 
     // EXAMPLE 2
-    // Remove person and stadium, then updating matches data (removing person from match squads)
-    PersonListNode* peopleWrapped = pm.getAllPeopleWrapped();
-    if (peopleWrapped && peopleWrapped->person)
+    if (p_max)
     {
-        cout << "Deleting person..." << endl;
-        pm.deletePerson(1);
+        cout << "Deleting person (Max Payne)..." << endl;
+        plm.removePlayerByPersonId(p_max->id);
+        pm.deletePerson(p_max->id);
     }
     cout << "=== Matches after person deletion (person removed from match squads) ===" << endl;
-    if (stadiumX)
+
+    if (stadiumX) {
         cout << "Deleting stadium: " << stadiumX->data.name << endl;
         sm.deleteStadium(stadiumX);
+    }
 
     cout << "=== Matches after deletions (clubs/stadiums/persons updated) ===" << endl;
     mm.displayMatchesList();
 
     cout << "=== Clubs after deletions (stadiums/persons updated) ===" << endl;
     cm.displayClubList();
-
-    // Cleaning data( wrapped lists)
-    mm.deleteAllWrappedMatches(matches);
-    mm.deleteAllWrappedMatches(match_node);
-    pm.deleteAllWrappedPeople(peopleWrapped);
 
     return 0;
 }

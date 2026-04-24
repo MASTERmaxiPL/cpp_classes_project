@@ -1,20 +1,22 @@
 #ifndef FOOTBALL_MANAGEMENT_SYSTEM_CLUB_MANAGER_H
 #define FOOTBALL_MANAGEMENT_SYSTEM_CLUB_MANAGER_H
 
+#include <functional>
+#include <vector>
+
 #include "Club.h"
 #include "../match/MatchManager.h"
-#include "../person/Player.h"
+#include "../person/player/Player.h"
 
 
 class ClubManager {
     Club* head;
     MatchManager* matchManager;
 
-    static void deleteAllWrappedClubStadiums(StadiumListNode*& head);
-    static void deleteAllWrappedClubPeople(PersonListNode*& head);
     void clearClubMemory(Club* club) const;
+    static Club* copyClub(const Club* other);
 public:
-    ClubManager(MatchManager* matchManager = nullptr);
+    explicit ClubManager(MatchManager* matchManager = nullptr);
     ~ClubManager();
 
     ClubManager(const ClubManager& other);
@@ -25,28 +27,23 @@ public:
     void club(const char* name, Country country, int founded_year);
     void club(const char* name, Country country);
 
-    ClubListNode* getAllClubsWrapped() const;
+    vector<Club*> getAllClubsCollection() const;
 
     Club* findClubByName(const char* name) const;
-    static Club* findClubByNameInWrapper(const char* name, ClubListNode* head) ;
 
-    static ClubListNode* findClubsByCountry(Country country, ClubListNode* head);
-    static ClubListNode* findClubsByCity(const char* city, ClubListNode* head);
-    static ClubListNode* findClubsByFoundedYear(int founded_year, ClubListNode* head);
-    static ClubListNode* findClubsByNewerFoundedYear(int founded_year, ClubListNode* head);
-    static ClubListNode* findClubsByOlderFoundedYear(int founded_year, ClubListNode* head);
+    static vector<Club*> filterClubs(const vector<Club*>& clubs, const function<bool(Club*)>& predicate);
+    static vector<Club*> findClubsByCountry(Country country, const std::vector<Club*>& clubs);
+    static vector<Club*> findClubsByCity(const char* city, const std::vector<Club*>& clubs);
+    static vector<Club*> findClubsByFoundedYear(int founded_year, const std::vector<Club*>& clubs);
+    static vector<Club*> findClubsByNewerFoundedYear(int founded_year, const std::vector<Club*>& clubs);
+    static vector<Club*> findClubsByOlderFoundedYear(int founded_year, const std::vector<Club*>& clubs);
 
     bool deleteClub(Club* club);
-    static bool deleteWrappedClub(ClubListNode*& head, Club* club);
 
     void deleteAllClubs();
-    static void deleteAllWrappedList(ClubListNode*& head);
 
     static void displayClub(const Club* club);
     void displayClubList() const;
-
-    static void displayWrappedClub(const ClubListNode* wrapped_club);
-    static void displayWrappedClubList(ClubListNode* wrapped_club);
 
     static void addStadiumToClub(Stadium* stadium, Club* club);
     static void addPlayerToClub(Player* player, Club* club);

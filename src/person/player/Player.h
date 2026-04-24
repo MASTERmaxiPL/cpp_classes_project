@@ -2,11 +2,11 @@
 #define FOOTBALL_MANAGEMENT_SYSTEM_PLAYER_H
 # pragma once
 
-#include "Person.h"
+#include "../Person.h"
 #include "Position.h"
 
-struct Player : Person
-{
+struct Player {
+    Person* person;
     Position position;
 };
 

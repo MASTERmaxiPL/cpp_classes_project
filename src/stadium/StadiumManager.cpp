@@ -89,18 +89,18 @@ void StadiumManager::stadium(const char* name, const Country country, const char
 }
 
 // --- GETTERS ---
-StadiumListNode* StadiumManager::getAllStadiumsWrapped() const
+vector<Stadium*> StadiumManager::getAllStadiumsCollection() const
 {
-    StadiumListNode* result = nullptr;
+    vector<Stadium*> results;
+    Stadium* curr = head;
 
-    Stadium* curr = this->head;
-
-    while (curr) {
-        result = new StadiumListNode{curr, result};
+    while (curr)
+    {
+        results.push_back(curr);
         curr = curr->next;
     }
 
-    return result;
+    return results;
 }
 
 // -- SETTERS ---
@@ -110,104 +110,51 @@ void StadiumManager::setMatchManager(MatchManager* mgr)
 }
 
 // --- FILTERS ---
-Stadium* StadiumManager::findStadiumByName(const char* name) const {
-    Stadium* curr = head;
-    while (curr)
-    {
-        if (strcmp(curr->data.name, name) == 0)
-            return curr;
-        curr = curr->next;
+vector<Stadium*> StadiumManager::filterStadiums(const vector<Stadium*>& stadiums, function<bool(Stadium*)> predicate)
+{
+    vector<Stadium*> results;
+    for (Stadium* stadium : stadiums) {
+        if (stadium && predicate(stadium)) {
+            results.push_back(stadium);
+        }
+    }
+    return results;
+}
+
+Stadium* StadiumManager::findStadiumByName(const char* name, const vector<Stadium*>& stadiums) {
+    if (!name) return nullptr;
+
+    for (Stadium* stadium : stadiums) {
+        if (stadium && strcmp(stadium->data.name, name) == 0) {
+            return stadium;
+        }
     }
     return nullptr;
 }
 
-Stadium* StadiumManager::findStadiumByNameInWrapper(const char* name, StadiumListNode* head) {
-    if (!head)
-        return nullptr;
-
-    StadiumListNode* curr = head;
-    while (curr)
-    {
-        if (strcmp(curr->stadium->data.name, name) == 0)
-            return curr->stadium;
-        curr = curr->next;
-    }
-    return nullptr;
+vector<Stadium*> StadiumManager::findStadiumsByCountry(const Country country, const vector<Stadium*>& stadiums) {
+    return filterStadiums(stadiums, [country](Stadium* s) {
+        return s->data.country == country;
+    });
 }
 
-StadiumListNode* StadiumManager::findStadiumsByCountry(const Country country, StadiumListNode* head)
-{
-    if (!head)
-        return nullptr;
-
-    StadiumListNode* resultHead = nullptr;
-    StadiumListNode* curr = head;
-
-    while (curr)
-    {
-        if (country == curr->stadium->data.country)
-        {
-            resultHead = new StadiumListNode{curr->stadium, resultHead};
-        }
-        curr = curr->next;
-    }
-    return resultHead;
+vector<Stadium*> StadiumManager::findStadiumsByCity(const char* city, const vector<Stadium*>& stadiums) {
+    if (!city) return {};
+    return filterStadiums(stadiums, [city](Stadium* s) {
+        return strcmp(s->data.city, city) == 0;
+    });
 }
 
-StadiumListNode* StadiumManager::findStadiumsByCity(const char* city, StadiumListNode* head)
-{
-    if (!head)
-        return nullptr;
-
-    StadiumListNode* resultHead = nullptr;
-    StadiumListNode* curr = head;
-
-    while (curr)
-    {
-        if (strcmp(curr->stadium->data.city, city) == 0)
-        {
-            resultHead = new StadiumListNode{curr->stadium, resultHead};
-        }
-        curr = curr->next;
-    }
-    return resultHead;
+vector<Stadium*> StadiumManager::findStadiumsByMinSeats(const int minSeats, const vector<Stadium*>& stadiums) {
+    return filterStadiums(stadiums, [minSeats](Stadium* s) {
+        return s->data.numberOfSeats >= minSeats;
+    });
 }
 
-StadiumListNode* StadiumManager::findStadiumsByMinSeats(const int minSeats, StadiumListNode* head)
-{
-    if (!head)
-        return nullptr;
-
-    StadiumListNode* resultHead = nullptr;
-    StadiumListNode* curr = head;
-
-    while (curr)
-    {
-        if (curr->stadium->data.numberOfSeats >= minSeats)
-        {
-            resultHead = new StadiumListNode{curr->stadium, resultHead};
-        }
-        curr = curr->next;
-    }
-    return resultHead;
-}
-
-StadiumListNode* StadiumManager::findStadiumsByMaxSeats(const int maxSeats, StadiumListNode* head) {
-    if (!head)
-        return nullptr;
-
-    StadiumListNode* resultHead = nullptr;
-    StadiumListNode* curr = head;
-
-    while (curr)
-    {
-        if (curr->stadium->data.numberOfSeats <= maxSeats)
-        {
-            resultHead = new StadiumListNode{curr->stadium, resultHead};
-        }
-        curr = curr->next;
-    }
-    return resultHead;
+vector<Stadium*> StadiumManager::findStadiumsByMaxSeats(const int maxSeats, const vector<Stadium*>& stadiums) {
+    return filterStadiums(stadiums, [maxSeats](Stadium* s) {
+        return s->data.numberOfSeats <= maxSeats;
+    });
 }
 
 // --- DELETION ---
@@ -224,78 +171,32 @@ void StadiumManager::clearStadiumMemory(const Stadium* stadium) const
     }
 }
 
-bool StadiumManager::deleteStadium(Stadium* stadium)
-{
+bool StadiumManager::deleteStadium(Stadium* stadium) {
     if (!stadium) return false;
 
-    if (stadium == head)
-    {
-        Stadium* temp = head;
-        head = stadium->next;
-
-        if (temp->ownedBy)
-        {
-            ClubManager::removeStadiumFromClub(temp, temp->ownedBy);
+    if (stadium->ownedBy) {
+        auto& clubStadiums = stadium->ownedBy->data.stadiums;
+        for (auto it = clubStadiums.begin(); it != clubStadiums.end(); ++it) {
+            if (*it == stadium) {
+                clubStadiums.erase(it);
+                break;
+            }
         }
-
-        if (this->matchManager)
-        {
-            this->matchManager->removeStadiumFromMatchData(stadium);
-        }
-
-        clearStadiumMemory(temp);
-        return true;
     }
 
-    Stadium* prev = head;
-    while (prev && prev->next != stadium)
-        prev = prev->next;
-    if (prev)
-    {
-        prev->next = stadium->next;
-
-        if (stadium->ownedBy)
-        {
-            ClubManager::removeStadiumFromClub(stadium, stadium->ownedBy);
-        }
-
-        if (this->matchManager)
-        {
-            this->matchManager->removeStadiumFromMatchData(stadium);
-        }
-        clearStadiumMemory(stadium);
-        return true;
+    if (this->matchManager) {
+        this->matchManager->removeStadiumFromMatchData(stadium);
     }
 
-    return false;
-}
-
-bool StadiumManager::deleteWrappedStadium(StadiumListNode*& head, Stadium* target)
-{
-    if (!head || !target)
-        return false;
-
-    if (head->stadium == target)
-    {
-        StadiumListNode* temp = head;
+    if (head == stadium) {
         head = head->next;
-        delete temp;
-        return true;
+    } else {
+        Stadium* prev = head;
+        while (prev && prev->next != stadium) prev = prev->next;
+        if (prev) prev->next = stadium->next;
     }
 
-    StadiumListNode* prev = head;
-    while (prev->next && prev->next->stadium != target)
-    {
-        prev = prev->next;
-    }
-
-    if (!prev->next)
-        return false;
-
-    StadiumListNode* temp = prev->next;
-    prev->next = temp->next;
-    delete temp;
-
+    clearStadiumMemory(stadium);
     return true;
 }
 
@@ -308,16 +209,6 @@ void StadiumManager::deleteAllStadiums()
         head = next;
     }
     this->head = nullptr;
-}
-
-void StadiumManager::deleteAllWrappedStadiums(StadiumListNode*& head)
-{
-    while (head)
-    {
-        StadiumListNode* next = head->next;
-        delete head;
-        head = next;
-    }
 }
 
 // --- DISPLAY ---
@@ -338,30 +229,6 @@ void StadiumManager::displayStadiumList() const
     while (curr)
     {
         displayStadium(curr);
-        curr = curr->next;
-    }
-    cout << "===============" << endl;
-}
-
-void StadiumManager::displayWrappedStadium(const StadiumListNode* wrapped_stadium)
-{
-    if (!wrapped_stadium)
-        return;
-
-    displayStadium(wrapped_stadium->stadium);
-}
-
-void StadiumManager::displayWrappedStadiumList(StadiumListNode* wrapped_stadium)
-{
-    if (!wrapped_stadium)
-        return;
-
-    StadiumListNode* curr = wrapped_stadium;
-
-    cout << "Stadiums List" << endl;
-    while (curr)
-    {
-        displayWrappedStadium(curr);
         curr = curr->next;
     }
     cout << "===============" << endl;

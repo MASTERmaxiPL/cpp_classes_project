@@ -21,13 +21,6 @@ struct Person {
     PersonData data{};
     Club* hiredBy{nullptr};
     Person* next{nullptr};
-
-    virtual ~Person() = default;
-};
-
-struct PersonListNode {
-    Person* person;
-    PersonListNode* next;
 };
 
 #endif

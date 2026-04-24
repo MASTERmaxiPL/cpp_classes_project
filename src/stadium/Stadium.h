@@ -21,9 +21,4 @@ struct Stadium{
     Stadium* next{nullptr};
 };
 
-struct StadiumListNode {
-    Stadium* stadium{};
-    StadiumListNode* next{nullptr};
-};
-
 #endif

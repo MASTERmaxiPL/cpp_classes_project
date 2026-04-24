@@ -3,8 +3,6 @@
 #pragma once
 
 #include "Person.h"
-#include "Player.h"
-#include "Staff.h"
 #include "../utils/Country.h"
 #include "../match/MatchManager.h"
 #include "../utils/IdGenerator.h"
@@ -15,6 +13,7 @@ class PersonManager {
     MatchManager* matchManager;
 
     static void clearPersonMemory(Person* person);
+    static Person* copyPerson(const Person* other);
 public:
     explicit PersonManager(MatchManager* matchManager = nullptr);
     ~PersonManager();
@@ -22,37 +21,26 @@ public:
     PersonManager(const PersonManager& other);
     PersonManager& operator=(const PersonManager& other);
 
-    void player(const char* name, const char* surname, int age, Country nationality, Position position);
-    void staff(const char* name, const char* surname, int age, Country nationality, Role role);
+    void person(const char* name, const char* surname, int age, Country nationality);
 
     static void updatePerson(Person* person, const char* name, const char* surname, int age, Country nationality);
-    static void updatePlayer(Player* player, const char* name, const char* surname, int age, Country nationality, Position position);
-    static void updateStaff(Staff* staff, const char* name, const char* surname, int age, Country nationality, Role role);
 
-    PersonListNode* getAllPeopleWrapped() const;
+    vector<Person*> getAllPeopleCollection() const;
 
-    static Person* findPersonById(uint32_t id, const PersonListNode* head);
-
-    static PersonListNode* findPeopleByName(const char* name,const char* surname, const PersonListNode* head);
-    static PersonListNode* findPeopleByAge(int age, const PersonListNode* head);
-    static PersonListNode* findPeopleYoungerThan(int age, const PersonListNode* head);
-    static PersonListNode* findPeopleOlderThan(int age, const PersonListNode* head);
-    static PersonListNode* findPeopleByNationality(Country nationality, const PersonListNode* head);
-
-    static PersonListNode* findPlayersByPosition(Position position, const PersonListNode* head);
-    static PersonListNode* findStaffByRole(Role role, const PersonListNode* head);
+    static vector<Person*> filterPeople(const std::vector<Person*>& people, const std::function<bool(Person*)>& predicate);
+    Person* findPersonById(uint32_t id) const;
+    static vector<Person*> findPeopleByName(const char* name, const char* surname, const std::vector<Person*>& people) ;
+    static vector<Person*> findPeopleByAge(int age, const std::vector<Person*>& people) ;
+    static vector<Person*> findPeopleYoungerThan(int age, const std::vector<Person*>& people);
+    static vector<Person*> findPeopleOlderThan(int age, const std::vector<Person*>& people);
+    static vector<Person*> findPeopleByNationality(Country nationality, const std::vector<Person*>& people);
 
     bool deletePerson(uint32_t personId);
-    static bool deleteWrappedPerson(PersonListNode*& head, uint32_t personId);
 
     void deleteAllPeople();
-    static void deleteAllWrappedPeople(PersonListNode*& head);
 
     static void displayPerson(const Person* person);
     void displayPeopleList() const;
-
-    static void displayWrappedPerson(const PersonListNode* wrapped_person);
-    static void displayWrappedPeopleList(PersonListNode* wrapped_person);
 
     void setMatchManager(MatchManager* mgr);
 };

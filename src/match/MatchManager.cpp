@@ -164,139 +164,73 @@ void MatchManager::updateMatch(Match* match, const tm& date, Club* home_club, Cl
 }
 
 // --- GETTERS ---
-MatchListNode* MatchManager::getAllMatchesWrapped() const
+vector<Match*> MatchManager::getAllMatchesCollection() const
 {
-    MatchListNode* result = nullptr;
-
+    vector<Match*> results;
     Match* curr = head;
+
     while (curr)
     {
-        result = new MatchListNode{curr, result};
+        results.push_back(curr);
         curr = curr->next;
     }
 
-    return result;
+    return results;
 }
 
 // --- FILTERS ---
-Match* MatchManager::findMatchById(const uint32_t id, const MatchListNode* head)
+Match* MatchManager::findMatchById(const uint32_t id, const vector<Match*>& matches)
 {
-    while (head)
-    {
-        if (head->match->id == id)
-            return head->match;
-        head = head->next;
+    for (Match* match : matches) {
+        if (match && match->id == id) {
+            return match;
+        }
     }
     return nullptr;
 }
 
-MatchListNode* MatchManager::findMatchesByDate(const tm& date, const int day_range, const int month_range, const int year_range, MatchListNode* head)
-{
-    if (!head)
-    {
-        return nullptr;
-    }
-
-    MatchListNode* result = nullptr;
-    MatchListNode* curr = head;
-    while (curr)
-    {
-        const tm& match_date = curr->match->data.date;
-        if (abs(match_date.tm_mday - date.tm_mday) <= day_range &&
-            abs(match_date.tm_mon - date.tm_mon) <= month_range &&
-            abs(match_date.tm_year - date.tm_year) <= year_range)
-        {
-            result = new MatchListNode{curr->match, result};
+vector<Match*> MatchManager::filterMatches(const vector<Match*>& matches, const function<bool(Match*)>& predicate) {
+    vector<Match*> results;
+    for (Match* match : matches) {
+        if (match && predicate(match)) {
+            results.push_back(match);
         }
-        curr = curr->next;
     }
-
-    return result;
+    return results;
 }
 
-MatchListNode* MatchManager::findMatchesByClub(Club* club, MatchListNode* head)
-{
-    if (!head)
-    {
-        return nullptr;
-    }
-
-    MatchListNode* result = nullptr;
-    MatchListNode* curr = head;
-    while (curr)
-    {
-        if (curr->match->data.home_club == club || curr->match->data.away_club == club)
-        {
-            result = new MatchListNode{curr->match, result};
-        }
-        curr = curr->next;
-    }
-
-    return result;
+vector<Match*> MatchManager::findMatchesByDate(const tm& date, const int day_range, const int month_range, const int year_range, const vector<Match*>& matches) {
+    return filterMatches(matches, [&](Match* m) {
+        const tm& m_date = m->data.date;
+        return abs(m_date.tm_mday - date.tm_mday) <= day_range &&
+               abs(m_date.tm_mon - date.tm_mon) <= month_range &&
+               abs(m_date.tm_year - date.tm_year) <= year_range;
+    });
 }
 
-MatchListNode* MatchManager::findMatchesByClubs(Club* club1, Club* club2, MatchListNode* head)
-{
-    if (!head)
-    {
-        return nullptr;
-    }
-
-    MatchListNode* result = nullptr;
-    MatchListNode* curr = head;
-    while (curr)
-    {
-        if ((curr->match->data.home_club == club1 && curr->match->data.away_club == club2) ||
-            (curr->match->data.home_club == club2 && curr->match->data.away_club == club1))
-        {
-            result = new MatchListNode{curr->match, result};
-        }
-        curr = curr->next;
-    }
-
-    return result;
+vector<Match*> MatchManager::findMatchesByClub(Club* club, const vector<Match*>& matches) {
+    return filterMatches(matches, [club](Match* m) {
+        return m->data.home_club == club || m->data.away_club == club;
+    });
 }
 
-MatchListNode* MatchManager::findMatchesByStadium(Stadium* stadium, MatchListNode* head)
-{
-    if (!head)
-    {
-        return nullptr;
-    }
-
-    MatchListNode* result = nullptr;
-    MatchListNode* curr = head;
-    while (curr)
-    {
-        if (curr->match->data.stadium == stadium)
-        {
-            result = new MatchListNode{curr->match, result};
-        }
-        curr = curr->next;
-    }
-
-    return result;
+vector<Match*> MatchManager::findMatchesByClubs(Club* club1, Club* club2, const vector<Match*>& matches) {
+    return filterMatches(matches, [club1, club2](Match* m) {
+        return (m->data.home_club == club1 && m->data.away_club == club2) ||
+               (m->data.home_club == club2 && m->data.away_club == club1);
+    });
 }
 
-MatchListNode* MatchManager::findUnplayedMatches(MatchListNode* head)
-{
-    if (!head)
-    {
-        return nullptr;
-    }
+vector<Match*> MatchManager::findMatchesByStadium(Stadium* stadium, const vector<Match*>& matches) {
+    return filterMatches(matches, [stadium](Match* m) {
+        return m->data.stadium == stadium;
+    });
+}
 
-    MatchListNode* result = nullptr;
-    MatchListNode* curr = head;
-    while (curr)
-    {
-        if (curr->match->data.score_home_club == -1 && curr->match->data.score_away_club == -1)
-        {
-            result = new MatchListNode{curr->match, result};
-        }
-        curr = curr->next;
-    }
-
-    return result;
+vector<Match*> MatchManager::findUnplayedMatches(const vector<Match*>& matches) {
+    return filterMatches(matches, [](Match* m) {
+        return m->data.score_home_club == -1 && m->data.score_away_club == -1;
+    });
 }
 
 // --- DELETION ---
@@ -338,53 +272,11 @@ bool MatchManager::deleteMatch(Match* match)
     return false;
 }
 
-bool MatchManager::deleteWrappedMatch(MatchListNode*& head, const uint32_t matchId)
-{
-    if (!head)
-        return false;
-
-    if (head->match->id == matchId)
-    {
-        MatchListNode* temp = head;
-        head = head->next;
-        clearSquadMemory(temp->match->data.homeSquad);
-        clearSquadMemory(temp->match->data.awaySquad);
-        delete temp;
-        return true;
-    }
-
-    MatchListNode* prev = head;
-    while (prev->next && prev->next->match->id != matchId)
-        prev = prev->next;
-
-    if (prev->next)
-    {
-        MatchListNode* temp = prev->next;
-        prev->next = prev->next->next;
-        clearSquadMemory(temp->match->data.homeSquad);
-        clearSquadMemory(temp->match->data.awaySquad);
-        delete temp;
-        return true;
-    }
-
-    return false;
-}
-
 void MatchManager::deleteAllMatches()
 {
     while (head)
     {
         Match* next = head->next;
-        delete head;
-        head = next;
-    }
-}
-
-void MatchManager::deleteAllWrappedMatches(MatchListNode*& head)
-{
-    while (head)
-    {
-        MatchListNode* next = head->next;
         delete head;
         head = next;
     }
@@ -485,24 +377,5 @@ void MatchManager::displayMatchesList() const
         displayMatch(curr);
         cout << "-----------------------------" << endl;
         curr = curr->next;
-    }
-}
-
-void MatchManager::displayWrappedMatch(const MatchListNode* wrapped_match)
-{
-    if (!wrapped_match)
-        return;
-
-    displayMatch(wrapped_match->match);
-}
-
-void MatchManager::displayWrappedMatchesList(MatchListNode* head)
-{
-    cout << "Matches List: " << endl;
-    while (head)
-    {
-        displayMatch(head->match);
-        cout << "-----------------------------" << endl;
-        head = head->next;
     }
 }

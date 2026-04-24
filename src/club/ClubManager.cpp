@@ -1,9 +1,9 @@
 #include "ClubManager.h"
-
 #include <iostream>
 #include <cstring>
+#include <vector>
+#include <functional>
 
-#include "../person/PersonManager.h"
 #include "../stadium/StadiumManager.h"
 #include "../match/MatchManager.h"
 
@@ -12,33 +12,64 @@ using namespace std;
 // --- CONSTRUCTORS & DESTRUCTORS ---
 ClubManager::ClubManager(MatchManager* matchManager) : head(nullptr), matchManager(matchManager) {}
 
-ClubManager::~ClubManager()
-{
+ClubManager::~ClubManager() {
     deleteAllClubs();
 }
 
-ClubManager::ClubManager(const ClubManager& other)
-{
-    head = nullptr;
-    matchManager = other.matchManager;
+ClubManager::ClubManager(const ClubManager& other) : head(nullptr), matchManager(other.matchManager) {
     *this = other;
 }
 
-ClubManager& ClubManager::operator=(const ClubManager& other)
-{
-    if (this == &other)
-        return *this;
+Club* ClubManager::copyClub(const Club* other) {
+    if (!other) return nullptr;
+
+    const auto newClub = new Club();
+    newClub->data.country = other->data.country;
+    newClub->data.founded_year = other->data.founded_year;
+    newClub->next = nullptr;
+
+    if (other->data.name) {
+        newClub->data.name = new char[strlen(other->data.name) + 1];
+        strcpy(newClub->data.name, other->data.name);
+    } else {
+        newClub->data.name = nullptr;
+    }
+
+    if (other->data.city) {
+        newClub->data.city = new char[strlen(other->data.city) + 1];
+        strcpy(newClub->data.city, other->data.city);
+    } else {
+        newClub->data.city = nullptr;
+    }
+
+    newClub->data.stadiums = other->data.stadiums;
+    newClub->data.players = other->data.players;
+    newClub->data.staff = other->data.staff;
+
+    return newClub;
+}
+
+ClubManager& ClubManager::operator=(const ClubManager& other) {
+    if (this == &other) return *this;
 
     deleteAllClubs();
 
     this->matchManager = other.matchManager;
 
-    Club* curr = other.head;
-    while (curr)
-    {
-        this->club(curr->data.name, curr->data.country, curr->data.city, curr->data.founded_year);
-        curr = curr->next;
+    const Club* currentOther = other.head;
+    Club** target = &this->head;
+
+    while (currentOther) {
+        *target = copyClub(currentOther);
+
+        if (*target) {
+            target = &((*target)->next);
+        }
+
+        currentOther = currentOther->next;
     }
+
+    *target = nullptr;
     return *this;
 }
 
@@ -56,22 +87,17 @@ void ClubManager::club(const char* name, const Country country, const int founde
 }
 
 void ClubManager::club(const char* name, const Country country, const char* city, const int founded_year) {
-    if (!name)
-        return;
+    if (!name) return;
 
     Club* curr = head;
-    while (curr)
-    {
-        if (strcmp(curr->data.name, name) == 0)
-        {
+    while (curr) {
+        if (strcmp(curr->data.name, name) == 0) {
             cout << "Club with name " << name << " already exists. Club data will be edited" << endl;
             curr->data.country = country;
-            if (founded_year != -1)
-                curr->data.founded_year = founded_year;
-            if (city)
-            {
+            if (founded_year != -1) curr->data.founded_year = founded_year;
+            if (city) {
                 delete [] curr->data.city;
-                curr->data.city = new char[strlen(city) +1];
+                curr->data.city = new char[strlen(city) + 1];
                 strcpy(curr->data.city, city);
             }
             return;
@@ -80,229 +106,107 @@ void ClubManager::club(const char* name, const Country country, const char* city
     }
 
     auto newClub = new Club;
-
-    newClub->data.name = new char[strlen(name) +1];
+    newClub->data.name = new char[strlen(name) + 1];
     strcpy(newClub->data.name, name);
-
     newClub->data.country = country;
 
-    if (!city)
+    if (!city) {
         newClub->data.city = nullptr;
-    else
-    {
-        newClub->data.city = new char[strlen(city) +1];
+    } else {
+        newClub->data.city = new char[strlen(city) + 1];
         strcpy(newClub->data.city, city);
     }
 
     newClub->data.founded_year = founded_year;
 
-    curr = head;
+    newClub->next = head;
     head = newClub;
-    head->next = curr;
 }
 
-// --- GETTERS ---
-ClubListNode* ClubManager::getAllClubsWrapped() const
-{
-    ClubListNode* result = nullptr;
-
+// --- GETTERS & SETTERS ---
+vector<Club*> ClubManager::getAllClubsCollection() const {
+    vector<Club*> results;
     Club* curr = head;
-
     while (curr) {
-        result = new ClubListNode{curr, result};
+        results.push_back(curr);
         curr = curr->next;
     }
-
-    return result;
+    return results;
 }
 
-// --- SETTERS ---
-void ClubManager::setMatchManager(MatchManager* mgr)
-{
+void ClubManager::setMatchManager(MatchManager* mgr) {
     this->matchManager = mgr;
 }
 
 // --- FILTERS ---
-Club* ClubManager::findClubByName(const char* name) const
-{
+Club* ClubManager::findClubByName(const char* name) const {
     Club* curr = head;
     while (curr) {
-        if (!strcmp(curr->data.name, name))
-            return curr;
+        if (!strcmp(curr->data.name, name)) return curr;
         curr = curr->next;
     }
     return nullptr;
 }
 
-Club* ClubManager::findClubByNameInWrapper(const char* name, ClubListNode* head) {
-    if (!head)
-        return nullptr;
-
-    ClubListNode* curr = head;
-    while (curr)
-    {
-        if (strcmp(curr->club->data.name, name) == 0)
-            return curr->club;
-        curr = curr->next;
+vector<Club*> ClubManager::filterClubs(const vector<Club*>& clubs, const function<bool(Club*)>& predicate) {
+    vector<Club*> results;
+    for (Club* club : clubs) {
+        if (club && predicate(club)) results.push_back(club);
     }
-    return nullptr;
+    return results;
 }
 
-ClubListNode* ClubManager::findClubsByCountry(const Country country, ClubListNode* head) {
-    if (!head)
-        return nullptr;
-
-    ClubListNode* resultHead = nullptr;
-    ClubListNode* curr = head;
-
-    while (curr)
-    {
-        if (country == curr->club->data.country)
-        {
-            resultHead = new ClubListNode{curr->club, resultHead};
-        }
-        curr = curr->next;
-    }
-    return resultHead;
+vector<Club*> ClubManager::findClubsByCountry(const Country country, const vector<Club*>& clubs) {
+    return filterClubs(clubs, [country](Club* c) { return c->data.country == country; });
 }
 
-ClubListNode* ClubManager::findClubsByCity(const char* city, ClubListNode* head) {
-    if (!head)
-        return nullptr;
-
-    ClubListNode* resultHead = nullptr;
-    ClubListNode* curr = head;
-
-    while (curr)
-    {
-        if (strcmp(curr->club->data.city, city) == 0)
-        {
-            resultHead = new ClubListNode{curr->club, resultHead};
-        }
-        curr = curr->next;
-    }
-    return resultHead;
+vector<Club*> ClubManager::findClubsByCity(const char* city, const vector<Club*>& clubs) {
+    if (!city) return {};
+    return filterClubs(clubs, [city](Club* c) { return strcmp(c->data.city, city) == 0; });
 }
 
-ClubListNode* ClubManager::findClubsByFoundedYear(const int founded_year, ClubListNode* head) {
-    if (!head)
-        return nullptr;
-
-    ClubListNode* resultHead = nullptr;
-    ClubListNode* curr = head;
-
-    while (curr)
-    {
-        if (curr->club->data.founded_year == founded_year)
-        {
-            resultHead = new ClubListNode{curr->club, resultHead};
-        }
-        curr = curr->next;
-    }
-    return resultHead;
+vector<Club*> ClubManager::findClubsByFoundedYear(const int founded_year, const vector<Club*>& clubs) {
+    return filterClubs(clubs, [founded_year](Club* c) { return c->data.founded_year == founded_year; });
 }
 
-ClubListNode* ClubManager::findClubsByNewerFoundedYear(const int founded_year, ClubListNode* head) {
-    if (!head)
-        return nullptr;
-
-    ClubListNode* resultHead = nullptr;
-    ClubListNode* curr = head;
-
-    while (curr)
-    {
-        if (curr->club->data.founded_year > founded_year)
-        {
-            resultHead = new ClubListNode{curr->club, resultHead};
-        }
-        curr = curr->next;
-    }
-    return resultHead;
+vector<Club*> ClubManager::findClubsByNewerFoundedYear(const int founded_year, const vector<Club*>& clubs) {
+    return filterClubs(clubs, [founded_year](Club* c) { return c->data.founded_year > founded_year; });
 }
 
-ClubListNode* ClubManager::findClubsByOlderFoundedYear(const int founded_year, ClubListNode* head) {
-    if (!head)
-        return nullptr;
-
-    ClubListNode* resultHead = nullptr;
-    ClubListNode* curr = head;
-
-    while (curr)
-    {
-        if (curr->club->data.founded_year < founded_year)
-        {
-            resultHead = new ClubListNode{curr->club, resultHead};
-        }
-        curr = curr->next;
-    }
-    return resultHead;
+vector<Club*> ClubManager::findClubsByOlderFoundedYear(const int founded_year, const vector<Club*>& clubs) {
+    return filterClubs(clubs, [founded_year](Club* c) { return c->data.founded_year < founded_year; });
 }
 
 // --- DELETION ---
-void ClubManager::deleteAllWrappedClubStadiums(StadiumListNode*& head)
-{
-    while (head)
-    {
-        StadiumListNode* next = head->next;
-        delete head;
-        head = next;
-    }
-}
+void ClubManager::clearClubMemory(Club* club) const {
+    if (club) {
+        if (this->matchManager) matchManager->removeClubFromMatchData(club);
 
-void ClubManager::deleteAllWrappedClubPeople(PersonListNode*& head)
-{
-    while (head)
-    {
-        PersonListNode* next = head->next;
-        delete head;
-        head = next;
-    }
-}
-
-void ClubManager::clearClubMemory(Club* club) const
-{
-    if (club)
-    {
-        if (this->matchManager)
-            matchManager->removeClubFromMatchData(club);
-
-        StadiumListNode* sCurr = club->data.stadium;
-        while (sCurr)
-        {
-            if (sCurr->stadium)
-                sCurr->stadium->ownedBy = nullptr;
-            sCurr = sCurr->next;
+        for (Stadium* s : club->data.stadiums) {
+            if (s) s->ownedBy = nullptr;
         }
 
-        PersonListNode* pCurr = club->data.playersHead;
-        while (pCurr)
-        {
-            if (pCurr->person)
-                pCurr->person->hiredBy = nullptr;
-            pCurr = pCurr->next;
+        for (Player* p : club->data.players) {
+            if (p && p->person) p->person->hiredBy = nullptr;
         }
 
-        PersonListNode* stCurr = club->data.staffHead;
-        while (stCurr)
-        {
-            if (stCurr->person)
-                stCurr->person->hiredBy = nullptr;
-            stCurr = stCurr->next;
+        for (Staff* st : club->data.staff) {
+            if (st && st->person) st->person->hiredBy = nullptr;
         }
 
         delete[] club->data.name;
         delete[] club->data.city;
 
-        deleteAllWrappedClubStadiums(club->data.stadium);
-        deleteAllWrappedClubPeople(club->data.playersHead);
-        deleteAllWrappedClubPeople(club->data.staffHead);
+        club->data.stadiums.clear();
+        club->data.players.clear();
+        club->data.staff.clear();
 
         delete club;
     }
 }
 
 bool ClubManager::deleteClub(Club* club) {
-    if (!club) return false;
+    if (!club || !head) return false;
 
     if (club == head) {
         Club* temp = head;
@@ -312,43 +216,15 @@ bool ClubManager::deleteClub(Club* club) {
     }
 
     Club* prev = head;
-    while (prev && prev->next != club)
+    while (prev->next && prev->next != club) {
         prev = prev->next;
-    if (prev) {
+    }
+    if (prev->next == club) {
         prev->next = club->next;
         clearClubMemory(club);
         return true;
     }
     return false;
-}
-
-bool ClubManager::deleteWrappedClub(ClubListNode*& head, Club* target)
-{
-    if (!head || !target)
-        return false;
-
-    if (head->club == target)
-    {
-        ClubListNode* temp = head;
-        head = head->next;
-        delete temp;
-        return true;
-    }
-
-    ClubListNode* prev = head;
-    while (prev->next && prev->next->club != target)
-    {
-        prev = prev->next;
-    }
-
-    if (!prev->next)
-        return false;
-
-    ClubListNode* temp = prev->next;
-    prev->next = temp->next;
-    delete temp;
-
-    return true;
 }
 
 void ClubManager::deleteAllClubs() {
@@ -360,172 +236,115 @@ void ClubManager::deleteAllClubs() {
     this->head = nullptr;
 }
 
-void ClubManager::deleteAllWrappedList(ClubListNode*& head)
-{
-    while (head)
-    {
-        ClubListNode* next = head->next;
-        delete head;
-        head = next;
+// --- RELATIONSHIP MANAGEMENT ---
+void ClubManager::addStadiumToClub(Stadium* stadium, Club* club) {
+    if (!stadium || !club) return;
+
+    for (Stadium* s : club->data.stadiums) {
+        if (s == stadium) return;
     }
-}
 
-void ClubManager::displayClub(const Club *club) {
-    if (!club)
-        return;
-
-    cout << club->data.name << ": " << club->data.country << ", " << club->data.city <<
-        ", founded in" << club->data.founded_year << endl;
-    cout << "Number of stadiums:" << getClubStadiumsCount(club) <<  endl;
-    cout << "Number of players:" << getClubPlayersCount(club) << endl;
-    cout << "Number of staff:" << getClubStaffCount(club) << endl;
-}
-
-void ClubManager::displayClubList() const
-{
-    Club* curr = head;
-
-    cout << "Stadiums List" << endl;
-    while (curr)
-    {
-        displayClub(curr);
-        curr = curr->next;
-    }
-    cout << "===============" << endl;
-}
-
-void ClubManager::displayWrappedClub(const ClubListNode* wrapped_club)
-{
-    if (!wrapped_club)
-        return;
-
-    displayClub(wrapped_club->club);
-}
-
-void ClubManager::displayWrappedClubList(ClubListNode* wrapped_club)
-{
-    if (!wrapped_club)
-        return;
-
-    ClubListNode* curr = wrapped_club;
-
-    cout << "Stadiums List" << endl;
-    while (curr)
-    {
-        displayWrappedClub(curr);
-        curr = curr->next;
-    }
-    cout << "===============" << endl;
-}
-
-void ClubManager::addStadiumToClub(Stadium* stadium, Club* club)
-{
-    if (!stadium || !club)
-        return;
-
-    StadiumListNode* temp = club->data.stadium;
-    club->data.stadium = new StadiumListNode{stadium, temp};
+    club->data.stadiums.push_back(stadium);
     stadium->ownedBy = club;
 }
 
-void ClubManager::addPlayerToClub(Player* player, Club* club)
-{
-    if (!player || !club)
-        return;
+void ClubManager::addPlayerToClub(Player* player, Club* club) {
+    if (!player || !club || !player->person) return;
 
-    PersonListNode* temp = club->data.playersHead;
-    club->data.playersHead = new PersonListNode{player, temp};
-    player->hiredBy = club;
-}
-
-void ClubManager::addStaffToClub(Staff* staff, Club* club)
-{
-    if (!staff || !club)
-        return;
-
-    PersonListNode* temp = club->data.staffHead;
-    club->data.staffHead = new PersonListNode{staff, temp};
-    staff->hiredBy = club;
-}
-
-bool ClubManager::removeStadiumFromClub(Stadium* stadium, Club* club)
-{
-    if (!stadium || !club)
-        return false;
-
-    if (StadiumManager::deleteWrappedStadium(club->data.stadium, stadium))
-    {
-        stadium->ownedBy = nullptr;
-        return true;
+    for (Player* p : club->data.players) {
+        if (p->person && p->person->id == player->person->id) return;
     }
-    return false;
+
+    club->data.players.push_back(player);
+    player->person->hiredBy = club;
 }
 
-bool ClubManager::removePersonFromClub(Person* person, Club* club)
-{
-    if (!person || !club)
-        return false;
+void ClubManager::addStaffToClub(Staff* staff, Club* club) {
+    if (!staff || !club || !staff->person) return;
 
-    if (club->data.playersHead)
-    {
-        if (PersonManager::deleteWrappedPerson(club->data.playersHead, person->id)){
+    for (Staff* s : club->data.staff) {
+        if (s->person && s->person->id == staff->person->id) return;
+    }
+
+    club->data.staff.push_back(staff);
+    staff->person->hiredBy = club;
+}
+
+bool ClubManager::removeStadiumFromClub(Stadium* stadium, Club* club) {
+    if (!stadium || !club) return false;
+    bool removed = false;
+
+    for (auto it = club->data.stadiums.begin(); it != club->data.stadiums.end(); ) {
+        if (*it == stadium) {
+            it = club->data.stadiums.erase(it);
+            stadium->ownedBy = nullptr;
+            removed = true;
+        } else {
+            ++it;
+        }
+    }
+    return removed;
+}
+
+bool ClubManager::removePersonFromClub(Person* person, Club* club) {
+    if (!person || !club) return false;
+    bool removed = false;
+
+    for (auto it = club->data.players.begin(); it != club->data.players.end(); ) {
+        if ((*it)->person && (*it)->person->id == person->id) {
+            it = club->data.players.erase(it);
             person->hiredBy = nullptr;
-            return true;
+            removed = true;
+        } else {
+            ++it;
         }
     }
 
-    if (club->data.staffHead)
-    {
-        if (PersonManager::deleteWrappedPerson(club->data.staffHead, person->id))
-        {
+    for (auto it = club->data.staff.begin(); it != club->data.staff.end(); ) {
+        if ((*it)->person && (*it)->person->id == person->id) {
+            it = club->data.staff.erase(it);
             person->hiredBy = nullptr;
-            return true;
+            removed = true;
+        } else {
+            ++it;
         }
     }
-    return false;
+
+    return removed;
 }
 
-int ClubManager::getClubStadiumsCount(const Club* club)
-{
-    if (!club)
-        return 0;
-
-    int count = 0;
-    StadiumListNode* curr = club->data.stadium;
-    while (curr)
-    {
-        count++;
-        curr = curr->next;
-    }
-    return count;
+// --- COUNTS ---
+int ClubManager::getClubStadiumsCount(const Club* club) {
+    return club ? club->data.stadiums.size() : 0;
 }
 
-int ClubManager::getClubPlayersCount(const Club* club)
-{
-    if (!club)
-        return 0;
-
-    int count = 0;
-    PersonListNode* curr = club->data.playersHead;
-    while (curr)
-    {
-        count++;
-        curr = curr->next;
-    }
-    return count;
+int ClubManager::getClubPlayersCount(const Club* club) {
+    return club ? club->data.players.size() : 0;
 }
 
-int ClubManager::getClubStaffCount(const Club* club)
-{
-    if (!club)
-        return 0;
+int ClubManager::getClubStaffCount(const Club* club) {
+    return club ? club->data.staff.size() : 0;
+}
 
-    int count = 0;
-    PersonListNode* curr = club->data.staffHead;
-    while (curr)
-    {
-        count++;
+// --- DISPLAY ---
+void ClubManager::displayClub(const Club *club) {
+    if (!club) return;
+
+    cout << club->data.name << ": " << club->data.country << ", "
+         << (club->data.city ? club->data.city : "Unknown")
+         << ", founded in " << club->data.founded_year << endl;
+    cout << "Number of stadiums: " << getClubStadiumsCount(club) <<  endl;
+    cout << "Number of players: " << getClubPlayersCount(club) << endl;
+    cout << "Number of staff: " << getClubStaffCount(club) << endl;
+}
+
+void ClubManager::displayClubList() const {
+    Club* curr = head;
+    cout << "--- Club List ---" << endl;
+    while (curr) {
+        displayClub(curr);
+        cout << "-" << endl;
         curr = curr->next;
     }
-    return count;
+    cout << "=================" << endl;
 }

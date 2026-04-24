@@ -2,11 +2,11 @@
 #define FOOTBALL_MANAGEMENT_SYSTEM_STAFF_H
 #pragma once
 
-#include "Person.h"
+#include "../Person.h"
 #include "Role.h"
 
-struct Staff : Person
-{
+struct Staff {
+    Person* person;
     Role role;
 };
 
