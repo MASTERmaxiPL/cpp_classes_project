@@ -7,7 +7,7 @@
 #include "../utils/Country.h"
 #include "../person/staff/Staff.h"
 #include "../stadium/Stadium.h"
-#include "person/player/Player.h"
+#include "../person/player/Player.h"
 
 using namespace std;
 
