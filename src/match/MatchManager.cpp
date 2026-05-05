@@ -121,7 +121,6 @@ void MatchManager::addPlayerToSquad(Match* match, uint32_t playerId, Position po
 {
     if (!match) return;
 
-    // Create the node completely hidden inside the manager
     auto* newEntry = new MatchSquadEntry{playerId, pos, nullptr};
 
     if (isHomeSquad)
