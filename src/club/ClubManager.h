@@ -46,8 +46,8 @@ public:
     void displayClubList() const;
 
     static void addStadiumToClub(Stadium* stadium, Club* club);
-    static void addPlayerToClub(Player* player, Club* club);
-    static void addStaffToClub(Staff* staff, Club* club);
+    static void addPlayerToClub(Person* person, Position position, Club* club);
+    static void addStaffToClub(Person* person, Role role, Club* club);
 
     static bool removeStadiumFromClub(Stadium* stadium, Club* club);
     static bool removePersonFromClub(Person* person, Club* club);
@@ -55,6 +55,11 @@ public:
     static int getClubStadiumsCount(const Club* club);
     static int getClubPlayersCount(const Club* club);
     static int getClubStaffCount(const Club* club);
+
+    static vector<Player*> getPlayersByPosition(Position pos, const Club* club);
+    static vector<Staff*> getStaffsByRole(Role role, const Club* club);
+    static vector<Person*> extractPeopleFromPlayers(const vector<Player*>& players);
+    static vector<Person*> extractPeopleFromStaff(const vector<Staff*>& staff);
 
     void setMatchManager(MatchManager* mgr);
 };

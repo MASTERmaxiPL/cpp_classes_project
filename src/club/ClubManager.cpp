@@ -6,6 +6,7 @@
 
 #include "../stadium/StadiumManager.h"
 #include "../match/MatchManager.h"
+#include "../utils/Filter.h"
 
 using namespace std;
 
@@ -43,8 +44,18 @@ Club* ClubManager::copyClub(const Club* other) {
     }
 
     newClub->data.stadiums = other->data.stadiums;
-    newClub->data.players = other->data.players;
-    newClub->data.staff = other->data.staff;
+
+    for (Player* p : other->data.players) {
+        if (p) {
+            newClub->data.players.push_back(new Player{p->person, p->position});
+        }
+    }
+
+    for (Staff* s : other->data.staff) {
+        if (s) {
+            newClub->data.staff.push_back(new Staff{s->person, s->role});
+        }
+    }
 
     return newClub;
 }
@@ -188,10 +199,12 @@ void ClubManager::clearClubMemory(Club* club) const {
 
         for (Player* p : club->data.players) {
             if (p && p->person) p->person->hiredBy = nullptr;
+            delete p;
         }
 
         for (Staff* st : club->data.staff) {
             if (st && st->person) st->person->hiredBy = nullptr;
+            delete st;
         }
 
         delete[] club->data.name;
@@ -248,26 +261,30 @@ void ClubManager::addStadiumToClub(Stadium* stadium, Club* club) {
     stadium->ownedBy = club;
 }
 
-void ClubManager::addPlayerToClub(Player* player, Club* club) {
-    if (!player || !club || !player->person) return;
+void ClubManager::addPlayerToClub(Person* person, const Position position, Club* club) {
+    if (!person || !club) return;
 
-    for (Player* p : club->data.players) {
-        if (p->person && p->person->id == player->person->id) return;
+    if (person->hiredBy)
+    {
+        removePersonFromClub(person, person->hiredBy);
     }
 
-    club->data.players.push_back(player);
-    player->person->hiredBy = club;
+    auto* newPlayer = new Player{person, position};
+    club->data.players.push_back(newPlayer);
+    person->hiredBy = club;
 }
 
-void ClubManager::addStaffToClub(Staff* staff, Club* club) {
-    if (!staff || !club || !staff->person) return;
+void ClubManager::addStaffToClub(Person* person, const Role role, Club* club) {
+    if (!person || !club) return;
 
-    for (Staff* s : club->data.staff) {
-        if (s->person && s->person->id == staff->person->id) return;
+    if (person->hiredBy)
+    {
+        removePersonFromClub(person, person->hiredBy);
     }
 
-    club->data.staff.push_back(staff);
-    staff->person->hiredBy = club;
+    auto* newStaff = new Staff{person, role};
+    club->data.staff.push_back(newStaff);
+    person->hiredBy = club;
 }
 
 bool ClubManager::removeStadiumFromClub(Stadium* stadium, Club* club) {
@@ -292,8 +309,9 @@ bool ClubManager::removePersonFromClub(Person* person, Club* club) {
 
     for (auto it = club->data.players.begin(); it != club->data.players.end(); ) {
         if ((*it)->person && (*it)->person->id == person->id) {
-            it = club->data.players.erase(it);
             person->hiredBy = nullptr;
+            delete *it;
+            it = club->data.players.erase(it);
             removed = true;
         } else {
             ++it;
@@ -302,8 +320,9 @@ bool ClubManager::removePersonFromClub(Person* person, Club* club) {
 
     for (auto it = club->data.staff.begin(); it != club->data.staff.end(); ) {
         if ((*it)->person && (*it)->person->id == person->id) {
-            it = club->data.staff.erase(it);
             person->hiredBy = nullptr;
+            delete *it;
+            it = club->data.staff.erase(it);
             removed = true;
         } else {
             ++it;
@@ -324,6 +343,40 @@ int ClubManager::getClubPlayersCount(const Club* club) {
 
 int ClubManager::getClubStaffCount(const Club* club) {
     return club ? club->data.staff.size() : 0;
+}
+
+vector<Player*> ClubManager::getPlayersByPosition(Position pos, const Club* club) {
+    if (!club) return {};
+    return utils::filterRoster(club->data.players, [pos](Player* p) {
+        return p->position == pos;
+    });
+}
+
+vector<Staff*> ClubManager::getStaffsByRole(Role role, const Club* club) {
+    if (!club) return {};
+    return utils::filterRoster(club->data.staff, [role](Staff* p) {
+        return p->role == role;
+    });
+}
+
+vector<Person*> ClubManager::extractPeopleFromPlayers(const vector<Player*>& players) {
+    vector<Person*> people;
+    for (Player* p : players) {
+        if (p && p->person) {
+            people.push_back(p->person);
+        }
+    }
+    return people;
+}
+
+vector<Person*> ClubManager::extractPeopleFromStaff(const vector<Staff*>& staff) {
+    vector<Person*> people;
+    for (Staff* s : staff) {
+        if (s && s->person) {
+            people.push_back(s->person);
+        }
+    }
+    return people;
 }
 
 // --- DISPLAY ---
