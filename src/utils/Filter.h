@@ -6,7 +6,7 @@
 namespace  utils
 {
     template <typename T, typename Predicate>
-    static std::vector<T*> filterRoster(const std::vector<T*>& roster, Predicate pred) {
+    static std::vector<T*> filter(const std::vector<T*>& roster, Predicate pred) {
         std::vector<T*> results;
         for (T* member : roster) {
             if (member && pred(member)) {

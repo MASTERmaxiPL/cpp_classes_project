@@ -347,14 +347,14 @@ int ClubManager::getClubStaffCount(const Club* club) {
 
 vector<Player*> ClubManager::getPlayersByPosition(Position pos, const Club* club) {
     if (!club) return {};
-    return utils::filterRoster(club->data.players, [pos](Player* p) {
+    return utils::filter(club->data.players, [pos](Player* p) {
         return p->position == pos;
     });
 }
 
 vector<Staff*> ClubManager::getStaffsByRole(Role role, const Club* club) {
     if (!club) return {};
-    return utils::filterRoster(club->data.staff, [role](Staff* p) {
+    return utils::filter(club->data.staff, [role](Staff* p) {
         return p->role == role;
     });
 }
