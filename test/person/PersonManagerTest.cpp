@@ -206,7 +206,7 @@ TEST_F(PersonManagerFullTest, FindPeopleByNationality) {
 }
 
 TEST_F(PersonManagerFullTest, FindPlayersByPosition) {
-    auto filtered = plm.findPlayersByPosition(GOALKEEPER);
+    auto filtered = plm.findPlayersByPosition(GOALKEEPER, plm.players);
     
     ASSERT_EQ(filtered.size(), 1);
     EXPECT_STREQ(filtered[0]->person->data.name, "Michal");

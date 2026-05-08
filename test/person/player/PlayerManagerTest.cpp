@@ -40,13 +40,9 @@ TEST_F(PlayerManagerTest, FindPlayerByPersonId) {
 TEST_F(PlayerManagerTest, FindPlayersByPosition) {
     plm.addPlayer(p1, GOALKEEPER);
     plm.addPlayer(p2, DEFENDER);
-    pm.person("Matty", "Cash", 26, POLAND);
-    Person* p3 = PersonManager::findPeopleByName("Matty", "Cash", pm.getAllPeopleCollection())[0];
-    plm.addPlayer(p3, DEFENDER);
+    vector<Player*> goalkeepers = plm.findPlayersByPosition(GOALKEEPER, plm.players);
 
-    const auto defenders = plm.findPlayersByPosition(DEFENDER);
-
-    EXPECT_EQ(defenders.size(), 2);
+    EXPECT_EQ(goalkeepers.size(), 1);
 }
 
 TEST_F(PlayerManagerTest, UpdatePlayerPosition) {

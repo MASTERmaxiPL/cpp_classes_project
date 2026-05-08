@@ -27,7 +27,7 @@ void PlayerManager::updatePlayerPosition(Player* player, Position newPosition) {
     }
 }
 
-vector<Player*> PlayerManager::filterPlayers(const function<bool(Player*)>& predicate) const {
+vector<Player*> PlayerManager::filterPlayers(const vector<Player*>& players, const function<bool(Player*)>& predicate) {
     vector<Player*> results;
     for (Player* player : players) {
         if (player && predicate(player)) {
@@ -46,8 +46,8 @@ Player* PlayerManager::findPlayerByPersonId(uint32_t personId) const {
     return nullptr;
 }
 
-vector<Player*> PlayerManager::findPlayersByPosition(Position position) const {
-    return filterPlayers([position](Player* p) {
+vector<Player*> PlayerManager::findPlayersByPosition(Position position, const vector<Player*>& players) {
+    return filterPlayers(players, [position](Player* p) {
         return p->position == position;
     });
 }

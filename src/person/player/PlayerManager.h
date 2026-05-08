@@ -7,18 +7,19 @@
 #include "Player.h"
 
 class PlayerManager {
+public:
     vector<Player*> players;
 
-public:
     PlayerManager() = default;
     ~PlayerManager();
 
     Player* addPlayer(Person* person, Position position);
     static void updatePlayerPosition(Player* player, Position newPosition);
 
-    vector<Player*> filterPlayers(const function<bool(Player*)>& predicate) const;
+    static vector<Player*> filterPlayers(const vector<Player*>& players, const function<bool(Player*)>& predicate);
     Player* findPlayerByPersonId(uint32_t personId) const;
-    vector<Player*> findPlayersByPosition(Position position) const;
+
+    static vector<Player*> findPlayersByPosition(Position position, const vector<Player*>& players);
 
     bool removePlayerByPersonId(uint32_t personId);
     void removeAllPlayers();
