@@ -26,9 +26,6 @@ set(DOMAIN_SOURCES
 add_library(domain STATIC ${DOMAIN_SOURCES})
 target_include_directories(domain PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
-add_executable(football_management_system src/main.cpp)
-target_link_libraries(football_management_system PRIVATE domain)
-
 enable_testing()
 include(GoogleTest)
 
