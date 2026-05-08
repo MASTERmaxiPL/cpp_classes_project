@@ -213,7 +213,7 @@ TEST_F(PersonManagerFullTest, FindPlayersByPosition) {
 }
 
 TEST_F(PersonManagerFullTest, FindStaffByRole) {
-    auto filtered = stm.findStaffByRole(MANAGER);
+    auto filtered = stm.findStaffByRole(MANAGER, stm.staffVector);
     
     ASSERT_EQ(filtered.size(), 1);
     EXPECT_STREQ(filtered[0]->person->data.surname, "Guardiola");

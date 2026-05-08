@@ -7,18 +7,19 @@
 #include "Staff.h"
 
 class StaffManager {
-    vector<Staff*> staffList;
-
 public:
+    vector<Staff*> staffVector;
+
     StaffManager() = default;
     ~StaffManager();
 
     Staff* addStaff(Person* person, Role role);
     static void updateStaffRole(Staff* staff, Role newRole);
 
-    vector<Staff*> filterStaff(const function<bool(Staff*)>& predicate) const;
+    static vector<Staff*> filterStaff(const vector<Staff*>& staffVector, const function<bool(Staff*)>& predicate);
     Staff* findStaffByPersonId(uint32_t personId) const;
-    vector<Staff*> findStaffByRole(Role role) const;
+
+    static vector<Staff*> findStaffByRole(Role role, const vector<Staff*>& staffVector);
 
     bool removeStaffByPersonId(uint32_t personId);
     void removeAllStaff();

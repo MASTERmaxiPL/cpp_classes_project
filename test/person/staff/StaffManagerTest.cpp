@@ -45,7 +45,7 @@ TEST_F(StaffManagerTest, FindStaffByRole) {
     Person* p3 = pm.findPeopleByName("Pep", "Guardiola", pm.getAllPeopleCollection())[0];
     sm.addStaff(p3, MANAGER);
 
-    const auto managers = sm.findStaffByRole(MANAGER);
+    const auto managers = sm.findStaffByRole(MANAGER, sm.staffVector);
 
     EXPECT_EQ(managers.size(), 2);
 }
