@@ -247,8 +247,8 @@ void PersonManager::deleteAllPeople() {
 void PersonManager::displayPerson(const Person* person) {
     if (!person) return;
     cout << "ID: " << person->id << " | " << person->data.name << " " << person->data.surname
-         << " | Age: " << person->data.age
-         << " | Nationality: " << person->data.nationality << endl;
+        << " | Age: " << person->data.age
+        << " | Nationality: " << person->data.nationality << endl;
 }
 
 void PersonManager::displayPeopleList() const {
