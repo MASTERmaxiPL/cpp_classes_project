@@ -352,11 +352,13 @@ TEST_F(MatchManagerTest, ChainFilters)
 
 TEST_F(MatchManagerTest, DeleteMatch)
 {
-    const auto list = mm.getAllMatchesCollection();
+    auto list = mm.getAllMatchesCollection();
     auto* match = mm.findMatchById(1, list);
 
     const bool deleted = mm.deleteMatch(match);
     EXPECT_TRUE(deleted);
+
+    list = mm.getAllMatchesCollection();
 
     Match* foundMatch = mm.findMatchById(1, list);
     EXPECT_EQ(foundMatch, nullptr);
