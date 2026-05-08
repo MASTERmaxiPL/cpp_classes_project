@@ -6,7 +6,7 @@
 
 #include "../stadium/StadiumManager.h"
 #include "../match/MatchManager.h"
-#include "../utils/Filter.h"
+#include "../utils/FilterUtils.h"
 
 using namespace std;
 

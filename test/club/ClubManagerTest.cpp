@@ -4,7 +4,7 @@
 #include "../../src/utils/Country.h"
 #include "../../src/person/PersonManager.h"
 #include "../../src/stadium/stadiumManager.h"
-#include "../../src/utils/Filter.h"
+#include "../../src/utils/FilterUtils.h"
 
 class ClubManagerTest : public testing::Test
 {
