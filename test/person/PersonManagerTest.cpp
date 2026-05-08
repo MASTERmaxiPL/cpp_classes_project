@@ -218,6 +218,8 @@ TEST_F(PersonManagerFullTest, DeletePersonRemovesFromClub) {
 
     EXPECT_EQ(cm.getClubPlayersCount(club), 0);
 
+    cm.addPlayerToClub(testP, FORWARD, club);
+
     EXPECT_EQ(cm.getClubPlayersCount(club), 1);
 
     const bool success = pm.deletePerson(testP->id);

@@ -4,6 +4,7 @@
 #include "../../src/utils/Country.h"
 #include "../../src/person/PersonManager.h"
 #include "../../src/stadium/stadiumManager.h"
+#include "../../src/utils/Filter.h"
 
 class ClubManagerTest : public testing::Test
 {
@@ -397,4 +398,55 @@ TEST_F(ClubManagerTest, RemoveStadiumFromClub)
     EXPECT_EQ(count, 0);
 
     delete stadium;
+}
+
+TEST_F(ClubManagerTest, CopyConstructorPerformsDeepCopy) {
+    Club* originalClub = cm.findClubByName("Legia Warszawa");
+
+    PersonManager pm;
+    pm.person("Test", "Player", 25, POLAND);
+    Person* p = PersonManager::findPeopleByName("Test", "Player", pm.getAllPeopleCollection())[0];
+
+    cm.addPlayerToClub(p, FORWARD, originalClub);
+
+    ClubManager copy(cm);
+    Club* copiedClub = copy.findClubByName("Legia Warszawa");
+
+    ASSERT_NE(copiedClub, nullptr);
+    ASSERT_EQ(copiedClub->data.players.size(), 1);
+
+
+    EXPECT_NE(copiedClub->data.players[0], originalClub->data.players[0]);
+
+    EXPECT_EQ(copiedClub->data.players[0]->person, originalClub->data.players[0]->person);
+}
+
+TEST_F(ClubManagerTest, PipelineFiltersVeteranForwards) {
+    Club* club = cm.findClubByName("Legia Warszawa");
+    PersonManager pm;
+
+    // Create 3 people
+    pm.person("Veteran", "Forward", 35, POLAND);
+    pm.person("Young", "Forward", 20, POLAND);
+    pm.person("Veteran", "Defender", 35, POLAND);
+
+    auto p1 = PersonManager::findPeopleByName("Veteran", "Forward", pm.getAllPeopleCollection())[0];
+    auto p2 = PersonManager::findPeopleByName("Young", "Forward", pm.getAllPeopleCollection())[0];
+    auto p3 = PersonManager::findPeopleByName("Veteran", "Defender", pm.getAllPeopleCollection())[0];
+
+    cm.addPlayerToClub(p1, FORWARD, club);
+    cm.addPlayerToClub(p2, FORWARD, club);
+    cm.addPlayerToClub(p3, DEFENDER, club);
+
+    vector<Player*> forwards = ClubManager::getPlayersByPosition(FORWARD, club);
+    EXPECT_EQ(forwards.size(), 2);
+
+    vector<Person*> forwardPeople = ClubManager::extractPeopleFromPlayers(forwards);
+    EXPECT_EQ(forwardPeople.size(), 2);
+
+    vector<Person*> veteranForwards = PersonManager::findPeopleOlderThan(29, forwardPeople);
+
+    ASSERT_EQ(veteranForwards.size(), 1);
+    EXPECT_STREQ(veteranForwards[0]->data.name, "Veteran");
+    EXPECT_STREQ(veteranForwards[0]->data.surname, "Forward");
 }
