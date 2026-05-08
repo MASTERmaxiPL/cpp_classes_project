@@ -74,6 +74,10 @@ PersonManager::~PersonManager() {
     deleteAllPeople();
 }
 
+void PersonManager::setMatchManager(MatchManager* mgr) {
+    this->matchManager = mgr;
+}
+
 // --- CREATION ---
 void PersonManager::person(const char* name, const char* surname, const int age, const Country nationality) {
     if (!name || !surname) {
@@ -255,8 +259,4 @@ void PersonManager::displayPeopleList() const {
         curr = curr->next;
     }
     cout << "==================" << endl;
-}
-
-void PersonManager::setMatchManager(MatchManager* mgr) {
-    this->matchManager = mgr;
 }
